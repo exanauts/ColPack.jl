@@ -1,0 +1,8 @@
+name = "ColPack"
+uuid = "ffa27691-3a59-46ab-a8d4-551f45b8d401"
+authors = ["Michel Schanen <Michel.Schanen@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+MatrixMarket = "4d4711f2-db25-561a-b6b3-d35e7d4047d3"
+SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
