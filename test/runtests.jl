@@ -1,4 +1,5 @@
 using ColPack
+using LinearAlgebra
 using MatrixMarket
 using Random
 using SparseArrays
@@ -18,26 +19,35 @@ push!(orderings, "DISTANCE_TWO_INCIDENCE_DEGREE")
 
 ncolors = Vector{Int}()
 
-push!(ncolors, 11)
-push!(ncolors, 9)
-push!(ncolors, 9)
-push!(ncolors, 10)
-push!(ncolors, 10)
-push!(ncolors, 10)
-push!(ncolors, 9)
-push!(ncolors, 9)
+push!(ncolors, 7)
+push!(ncolors, 7)
+push!(ncolors, 6)
+push!(ncolors, 6)
+push!(ncolors, 6)
+push!(ncolors, 6)
+push!(ncolors, 7)
+push!(ncolors, 6)
 # push!(ncolors, 10)
 
 Random.seed!(2713)
-A = sprand(100,100,0.1)
+# Create adjacency graph
+A = convert(SparseMatrixCSC, Symmetric(sprand(100,100,0.1)))
 
 const filename = joinpath(@__DIR__, "A.mtx")
 MatrixMarket.mmwrite(filename, A)
-verbose = 1
+verbose = false
 
 @testset "Test ColPack" begin
-    for (i,ordering) in enumerate(orderings)
-        coloring = ColPackColoring(filename, ColPack.d1, ordering, verbose)
-        @test length(unique(get_colors(coloring))) == ncolors[i]
+    @testset "Test Matrix Market API" begin
+        for (i,ordering) in enumerate(orderings)
+            coloring = ColPackColoring(filename, ColPack.d1, ordering; verbose=verbose)
+            @test length(unique(get_colors(coloring))) == ncolors[i]
+        end
+    end
+    @testset "Test ADOL-C Compressed Row Storage" begin
+        for (i,ordering) in enumerate(orderings)
+            coloring = ColPackColoring(A, ColPack.d1, ordering; verbose=verbose)
+            @test length(unique(get_colors(coloring))) == ncolors[i]
+        end
     end
 end
