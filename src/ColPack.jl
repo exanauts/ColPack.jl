@@ -84,6 +84,7 @@ function get_colors(coloring::ColPackColoring; verbose=false)
        Cvoid, (Ptr{Cvoid}, Ptr{Cdouble}, Cstring, Cint),
        coloring.refColPack[1], coloring.coloring, coloring.method.colpack_coloring, Cint(verbose)
    )
-   return coloring.coloring
+   # Julia colorings should be base 1
+   return coloring.coloring .+ 1
 end
 end #module
