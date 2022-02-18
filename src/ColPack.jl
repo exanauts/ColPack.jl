@@ -7,16 +7,19 @@ using SparseArrays
 
 export ColPackColoring, get_colors
 
-const d1 = "DISTANCE_ONE" 
-const d2 = "DISTANCE_TWO"
-const acyclic = "ACYCLIC", 
-const star = "STAR", 
+abstract type AbstractColoring end
+include("colorings.jl")
+export AbstractColoring
+
+abstract type AbstractOrdering end
+include("orderings.jl")
+export AbstractOrdering
 
 mutable struct ColPackColoring
     refColPack::Vector{Ptr{Cvoid}}
     coloring::Vector{Cint}
-    method::AbstractString
-    order::AbstractString
+    method::AbstractColoring
+    order::AbstractOrdering
     csr::Union{Vector{Ptr{Cuint}},Nothing}
 end
 
@@ -29,13 +32,13 @@ function free_coloring(g::ColPackColoring)
     return nothing
 end
 
-function ColPackColoring(filename::AbstractString, method::AbstractString, order::AbstractString; verbose::Bool=false)
+function ColPackColoring(filename::AbstractString, method::AbstractColoring, order::AbstractOrdering; verbose::Bool=false)
     reflen = Vector{Cint}([Cint(0)])
     refColPack = Vector{Ptr{Cvoid}}([C_NULL])
     ret = ccall(
         (:build_coloring, libcolpack),
         Cint, (Ptr{Cvoid}, Ptr{Cint}, Cstring, Cstring, Cstring, Cint),
-        refColPack, reflen, filename, method, order, Cint(verbose),
+        refColPack, reflen, filename, method.colpack_coloring, order.colpack_ordering, Cint(verbose),
     )
     if ret == 0
         error("ColPack coloring failed.")
@@ -46,7 +49,7 @@ function ColPackColoring(filename::AbstractString, method::AbstractString, order
     return g
 end
 
-function ColPackColoring(M::SparseMatrixCSC{VT,IT}, method::AbstractString, order::AbstractString; verbose::Bool=false) where {VT,IT}
+function ColPackColoring(M::SparseMatrixCSC{VT,IT}, method::AbstractColoring, order::AbstractOrdering; verbose::Bool=false) where {VT,IT}
     @assert issymmetric(M)
     csr = Vector{Ref{Cuint}}()
     for i in 1:(length(M.colptr) -1)
@@ -64,7 +67,7 @@ function ColPackColoring(M::SparseMatrixCSC{VT,IT}, method::AbstractString, orde
     ret = ccall(
         (:build_coloring_from_csr, libcolpack),
         Cint, (Ptr{Cvoid}, Ptr{Cint}, Ref{Ptr{Cuint}}, Cint, Cstring, Cstring, Cint),
-        refColPack, reflen, csr, nrows, method, order, Cint(verbose),
+        refColPack, reflen, csr, nrows, method.colpack_coloring, order.colpack_ordering, Cint(verbose),
     )
     if ret == 0
         error("ColPack coloring failed.")
@@ -79,7 +82,7 @@ function get_colors(coloring::ColPackColoring; verbose=false)
    ccall(
        (:get_colors, libcolpack),
        Cvoid, (Ptr{Cvoid}, Ptr{Cdouble}, Cstring, Cint),
-       coloring.refColPack[1], coloring.coloring, coloring.method, Cint(verbose)
+       coloring.refColPack[1], coloring.coloring, coloring.method.colpack_coloring, Cint(verbose)
    )
    return coloring.coloring
 end

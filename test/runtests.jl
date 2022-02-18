@@ -5,16 +5,16 @@ using Random
 using SparseArrays
 using Test
 
-orderings = Vector{String}()
+orderings = Vector{AbstractOrdering}()
 
-push!(orderings, "NATURAL")
-push!(orderings, "LARGEST_FIRST")
-push!(orderings, "DYNAMIC_LARGEST_FIRST")
-push!(orderings, "DISTANCE_TWO_LARGEST_FIRST")
-push!(orderings, "SMALLEST_LAST")
-push!(orderings, "DISTANCE_TWO_SMALLEST_LAST")
-push!(orderings, "INCIDENCE_DEGREE")
-push!(orderings, "DISTANCE_TWO_INCIDENCE_DEGREE")
+push!(orderings, natural_ordering())
+push!(orderings, largest_first_ordering())
+push!(orderings, dynamic_largest_first_ordering())
+push!(orderings, distance_two_largest_first_ordering())
+push!(orderings, smallest_last_ordering())
+push!(orderings, distance_two_smallest_last_ordering())
+push!(orderings, incidence_degree_ordering())
+push!(orderings, distance_two_incidence_degree_ordering())
 # push!(orderings, "RANDOM")
 
 ncolors = Vector{Int}()
@@ -40,13 +40,13 @@ verbose = false
 @testset "Test ColPack" begin
     @testset "Test Matrix Market API" begin
         for (i,ordering) in enumerate(orderings)
-            coloring = ColPackColoring(filename, ColPack.d1, ordering; verbose=verbose)
+            coloring = ColPackColoring(filename, d1_coloring(), ordering; verbose=verbose)
             @test length(unique(get_colors(coloring))) == ncolors[i]
         end
     end
     @testset "Test ADOL-C Compressed Row Storage" begin
         for (i,ordering) in enumerate(orderings)
-            coloring = ColPackColoring(A, ColPack.d1, ordering; verbose=verbose)
+            coloring = ColPackColoring(A, d1_coloring(), ordering; verbose=verbose)
             @test length(unique(get_colors(coloring))) == ncolors[i]
         end
     end
