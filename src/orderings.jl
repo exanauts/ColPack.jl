@@ -38,6 +38,11 @@ struct distance_two_incidence_degree_ordering <: AbstractOrdering
 end
 distance_two_incidence_degree_ordering() = distance_two_incidence_degree_ordering("DISTANCE_TWO_INCIDENCE_DEGREE")
 
+struct random_ordering <: AbstractOrdering
+    colpack_ordering::String
+end
+random_ordering() = random_ordering("RANDOM")
+
 const ORDERINGS = [
     distance_two_incidence_degree_ordering(),
     distance_two_largest_first_ordering(),
@@ -47,8 +52,10 @@ const ORDERINGS = [
     largest_first_ordering(),
     natural_ordering(),
     smallest_last_ordering(),
+    random_ordering(),
 ]
 
 export natural_ordering, largest_first_ordering, dynamic_largest_first_ordering, distance_two_largest_first_ordering
 export smallest_last_ordering, distance_two_smallest_last_ordering, incidence_degree_ordering, distance_two_incidence_degree_ordering
+export random_ordering
 export ORDERINGS
