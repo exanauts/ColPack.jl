@@ -38,5 +38,17 @@ struct distance_two_incidence_degree_ordering <: AbstractOrdering
 end
 distance_two_incidence_degree_ordering() = distance_two_incidence_degree_ordering("DISTANCE_TWO_INCIDENCE_DEGREE")
 
+const ORDERINGS = [
+    distance_two_incidence_degree_ordering(),
+    distance_two_largest_first_ordering(),
+    distance_two_smallest_last_ordering(),
+    dynamic_largest_first_ordering(),
+    incidence_degree_ordering(),
+    largest_first_ordering(),
+    natural_ordering(),
+    smallest_last_ordering(),
+]
+
 export natural_ordering, largest_first_ordering, dynamic_largest_first_ordering, distance_two_largest_first_ordering
 export smallest_last_ordering, distance_two_smallest_last_ordering, incidence_degree_ordering, distance_two_incidence_degree_ordering
+export ORDERINGS

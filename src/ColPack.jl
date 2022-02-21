@@ -54,14 +54,16 @@ end
 function ColPackColoring(M::SparseMatrixCSC{VT,IT}, method::AbstractColoring, order::AbstractOrdering; verbose::Bool=false) where {VT,IT}
     @assert issymmetric(M)
     csr = Vector{Ref{Cuint}}()
+    csr_mem = Vector{Vector{Cuint}}()
     for i in 1:(length(M.colptr) -1)
         vec = Vector{Cuint}()
-        # Number of column elements of column elements
-        push!(vec, M.colptr[i+1] - M.colptr[i])
+        # Number of column elements
+        push!(vec, Cuint(M.colptr[i+1] - M.colptr[i]))
         for j in M.colptr[i]:(M.colptr[i+1]-1)
-            push!(vec, M.rowval[j]-1)
+            push!(vec, Cuint(M.rowval[j]-1))
         end
         push!(csr, Base.unsafe_convert(Ptr{Cuint}, vec))
+        push!(csr_mem, vec)
     end
     nrows = size(M,2) 
     reflen = Vector{Cint}([Cint(0)])

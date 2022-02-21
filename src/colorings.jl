@@ -19,4 +19,12 @@ d2_coloring()= d2_coloring("DISTANCE_TWO")
 acyclic_coloring() = acyclic_coloring("ACYCLIC") 
 star_coloring() = star_coloring("STAR") 
 
+COLORINGS = [
+    d1_coloring(),
+    d2_coloring(),
+    acyclic_coloring(),
+    star_coloring()
+]
+
+export COLORINGS
 export d1_coloring, d2_coloring, acyclic_coloring, star_coloring
