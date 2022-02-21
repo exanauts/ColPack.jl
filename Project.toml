@@ -1,7 +1,7 @@
 name = "ColPack"
 uuid = "ffa27691-3a59-46ab-a8d4-551f45b8d401"
 authors = ["Michel Schanen <Michel.Schanen@gmail.com>"]
-version = "0.2.0"
+version = "0.2.1"
 
 [deps]
 ColPack_jll = "f218ff0c-cb54-5151-80c4-c0f62c730ce6"
