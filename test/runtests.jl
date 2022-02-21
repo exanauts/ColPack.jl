@@ -3,6 +3,7 @@ using LinearAlgebra
 using MatrixMarket
 using Random
 using SparseArrays
+using SparseDiffTools
 using Test
 
 orderings = Vector{AbstractOrdering}()
@@ -49,5 +50,19 @@ verbose = false
             coloring = ColPackColoring(A, d1_coloring(), ordering; verbose=verbose)
             @test length(unique(get_colors(coloring))) == ncolors[i]
         end
+    end
+    @testset "Test ColPack Columns Coloring" begin
+        A = [
+        [1.0 1.0 0.0 0.0 0.0];
+        [0.0 0.0 1.0 0.0 0.0];
+        [0.0 1.0 0.0 1.0 0.0];
+        [0.0 0.0 0.0 1.0 1.0];
+        ]
+
+        A = sparse(A)
+        adjA = ColPack.matrix2adjmatrix(A; partition_by_rows=false)
+        @test issymmetric(adjA)
+        coloring = ColPackColoring(adjA, d1_coloring(), natural_ordering(); verbose=true)
+        @test get_colors(coloring) == SparseDiffTools.matrix_colors(A)
     end
 end

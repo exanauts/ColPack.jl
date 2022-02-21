@@ -5,7 +5,7 @@ using LinearAlgebra
 using MatrixMarket
 using SparseArrays
 
-export ColPackColoring, get_colors
+export ColPackColoring, get_colors, matrix2adjmatrix
 
 abstract type AbstractColoring end
 include("colorings.jl")
@@ -14,6 +14,8 @@ export AbstractColoring
 abstract type AbstractOrdering end
 include("orderings.jl")
 export AbstractOrdering
+
+include("utils.jl")
 
 mutable struct ColPackColoring
     refColPack::Vector{Ptr{Cvoid}}
@@ -45,7 +47,7 @@ function ColPackColoring(filename::AbstractString, method::AbstractColoring, ord
     end
 
     g = ColPackColoring(refColPack, zeros(Int, reflen[1]), method, order, nothing)
-    # finalizer(free_coloring, g)
+    finalizer(free_coloring, g)
     return g
 end
 
@@ -74,7 +76,7 @@ function ColPackColoring(M::SparseMatrixCSC{VT,IT}, method::AbstractColoring, or
     end
 
     g = ColPackColoring(refColPack, zeros(Int, reflen[1]), method, order, csr)
-    # finalizer(free_coloring, g)
+    finalizer(free_coloring, g)
     return g
 end
 
