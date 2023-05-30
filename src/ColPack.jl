@@ -2,7 +2,6 @@ module ColPack
 
 using ColPack_jll
 using LinearAlgebra
-using MatrixMarket
 using SparseArrays
 
 export ColPackColoring, get_colors, matrix2adjmatrix
@@ -65,7 +64,7 @@ function ColPackColoring(M::SparseMatrixCSC{VT,IT}, method::AbstractColoring, or
         push!(csr, Base.unsafe_convert(Ptr{Cuint}, vec))
         push!(csr_mem, vec)
     end
-    nrows = size(M,2) 
+    nrows = size(M,2)
     reflen = Vector{Cint}([Cint(0)])
     refColPack = Vector{Ptr{Cvoid}}([C_NULL])
     ret = ccall(
