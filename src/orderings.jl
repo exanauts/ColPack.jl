@@ -54,8 +54,3 @@ const ORDERINGS = [
     smallest_last_ordering(),
     random_ordering(),
 ]
-
-export natural_ordering, largest_first_ordering, dynamic_largest_first_ordering, distance_two_largest_first_ordering
-export smallest_last_ordering, distance_two_smallest_last_ordering, incidence_degree_ordering, distance_two_incidence_degree_ordering
-export random_ordering
-export ORDERINGS

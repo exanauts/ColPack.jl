@@ -25,6 +25,3 @@ COLORINGS = [
     acyclic_coloring(),
     star_coloring()
 ]
-
-export COLORINGS
-export d1_coloring, d2_coloring, acyclic_coloring, star_coloring
