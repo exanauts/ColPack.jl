@@ -6,7 +6,7 @@ using SparseArrays
 using SparseDiffTools
 using Test
 
-orderings = Vector{AbstractOrdering}()
+orderings = Vector{ColoringOrder}()
 
 push!(orderings, natural_ordering())
 push!(orderings, largest_first_ordering())
@@ -16,7 +16,7 @@ push!(orderings, smallest_last_ordering())
 push!(orderings, distance_two_smallest_last_ordering())
 push!(orderings, incidence_degree_ordering())
 push!(orderings, distance_two_incidence_degree_ordering())
-# push!(orderings, "RANDOM")
+# push!(orderings, random_ordering())
 
 ncolors = Vector{Int}()
 
@@ -54,9 +54,9 @@ end
 
 @testset "ColPack Columns Coloring" begin
     A = [
-        [1.0 1.0 0.0 0.0 0.0];
-        [0.0 0.0 1.0 0.0 0.0];
-        [0.0 1.0 0.0 1.0 0.0];
+        [1.0 1.0 0.0 0.0 0.0]
+        [0.0 0.0 1.0 0.0 0.0]
+        [0.0 1.0 0.0 1.0 0.0]
         [0.0 0.0 0.0 1.0 1.0]
     ]
 

@@ -1,5 +1,6 @@
 using Aqua
 using ColPack
+using Documenter
 using JET
 using Test
 
@@ -9,6 +10,9 @@ using Test
         @testset "JET" begin
             JET.test_package(ColPack; target_defined_modules=true)
         end
+    end
+    @testset "Doctests" begin
+        Documenter.doctest(ColPack)
     end
     @testset verbose = true "Functionality" begin
         include("functionality.jl")
