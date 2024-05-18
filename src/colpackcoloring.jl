@@ -52,14 +52,14 @@ function ColPackColoring(
     verbose::Bool=false,
 )
     reflen = Vector{Cint}([Cint(0)])
-    refColPack = Vector{Ptr{Cvoid}}([C_NULL])
+    refColPack = Ref{Ptr{Cvoid}}(C_NULL)
     ret = @ccall libcolpack.build_coloring(
         refColPack::Ptr{Cvoid},
         reflen::Ptr{Cint},
         filename::Cstring,
         method.method::Cstring,
         order.order::Cstring,
-        Cint(verbose)::Cint,
+        verbose::Cint,
     )::Cint
     if ret == 0
         error("ColPack coloring failed.")
@@ -90,7 +90,7 @@ function ColPackColoring(
         push!(csr_mem, vec)
     end
     nrows = size(M, 2)
-    reflen = Vector{Cint}([Cint(0)])
+    reflen = Ref{Cint}(0)
     refColPack = Vector{Ptr{Cvoid}}([C_NULL])
     ret = @ccall libcolpack.build_coloring_from_csr(
         refColPack::Ptr{Cvoid},
@@ -99,7 +99,7 @@ function ColPackColoring(
         nrows::Cint,
         method.method::Cstring,
         order.order::Cstring,
-        Cint(verbose)::Cint,
+        verbose::Cint,
     )::Cint
     if ret == 0
         error("ColPack coloring failed.")
