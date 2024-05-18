@@ -5,10 +5,12 @@ using JET
 using Test
 
 @testset verbose = true "ColPack" begin
-    @testset verbose = false "Code quality" begin
-        Aqua.test_all(ColPack)
-        @testset "JET" begin
-            JET.test_package(ColPack; target_defined_modules=true)
+    if VERSION >= v"1.10"
+        @testset verbose = false "Code quality" begin
+            Aqua.test_all(ColPack)
+            @testset "JET" begin
+                JET.test_package(ColPack; target_defined_modules=true)
+            end
         end
     end
     @testset "Doctests" begin

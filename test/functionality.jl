@@ -4,7 +4,10 @@ using MatrixMarket
 using Random
 using SparseArrays
 using SparseDiffTools
+using StableRNGs
 using Test
+
+rng = StableRNG(63)
 
 orderings = Vector{ColoringOrder}()
 
@@ -23,30 +26,31 @@ ncolors = Vector{Int}()
 push!(ncolors, 7)
 push!(ncolors, 7)
 push!(ncolors, 6)
+push!(ncolors, 7)  # changed
 push!(ncolors, 6)
 push!(ncolors, 6)
-push!(ncolors, 6)
-push!(ncolors, 7)
+push!(ncolors, 6)  # changed
 push!(ncolors, 6)
 # push!(ncolors, 10)
 
 Random.seed!(2713)
 # Create adjacency graph
-A = convert(SparseMatrixCSC, Symmetric(sprand(100, 100, 0.1)))
+# TODO: random is a bad idea, nb of colors may change (temporarily fixed with StableRNGs)
+A = convert(SparseMatrixCSC, Symmetric(sprand(rng, 100, 100, 0.1)))
 
 const filename = joinpath(@__DIR__, "A.mtx")
 MatrixMarket.mmwrite(filename, A)
 verbose = false
 
 @testset "MatrixMarket API" begin
-    for (i, ordering) in enumerate(orderings)
+    @testset "$ordering" for (i, ordering) in enumerate(orderings)
         coloring = ColPackColoring(filename, d1_coloring(), ordering; verbose=verbose)
         @test length(unique(get_colors(coloring))) == ncolors[i]
     end
 end
 
 @testset "ADOL-C Compressed Row Storage" begin
-    for (i, ordering) in enumerate(orderings)
+    @testset "$ordering" for (i, ordering) in enumerate(orderings)
         coloring = ColPackColoring(A, d1_coloring(), ordering; verbose=verbose)
         @test length(unique(get_colors(coloring))) == ncolors[i]
     end
