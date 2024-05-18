@@ -53,17 +53,14 @@ function ColPackColoring(
 )
     reflen = Vector{Cint}([Cint(0)])
     refColPack = Vector{Ptr{Cvoid}}([C_NULL])
-    ret = ccall(
-        (:build_coloring, libcolpack),
-        Cint,
-        (Ptr{Cvoid}, Ptr{Cint}, Cstring, Cstring, Cstring, Cint),
-        refColPack,
-        reflen,
-        filename,
-        method.method,
-        order.order,
-        Cint(verbose),
-    )
+    ret = @ccall libcolpack.build_coloring(
+        refColPack::Ptr{Cvoid},
+        reflen::Ptr{Cint},
+        filename::Cstring,
+        method.method::Cstring,
+        order.order::Cstring,
+        Cint(verbose)::Cint,
+    )::Cint
     if ret == 0
         error("ColPack coloring failed.")
     end
@@ -95,18 +92,15 @@ function ColPackColoring(
     nrows = size(M, 2)
     reflen = Vector{Cint}([Cint(0)])
     refColPack = Vector{Ptr{Cvoid}}([C_NULL])
-    ret = ccall(
-        (:build_coloring_from_csr, libcolpack),
-        Cint,
-        (Ptr{Cvoid}, Ptr{Cint}, Ref{Ptr{Cuint}}, Cint, Cstring, Cstring, Cint),
-        refColPack,
-        reflen,
-        csr,
-        nrows,
-        method.method,
-        order.order,
-        Cint(verbose),
-    )
+    ret = @ccall libcolpack.build_coloring_from_csr(
+        refColPack::Ptr{Cvoid},
+        reflen::Ptr{Cint},
+        csr::Ref{Ptr{Cuint}},
+        nrows::Cint,
+        method.method::Cstring,
+        order.order::Cstring,
+        Cint(verbose)::Cint,
+    )::Cint
     if ret == 0
         error("ColPack coloring failed.")
     end
