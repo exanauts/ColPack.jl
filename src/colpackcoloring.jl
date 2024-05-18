@@ -33,7 +33,7 @@ The users needs to specify a coloring `method` and an `order` on the vertices.
 - [`ColoringOrder`](@ref)
 """
 mutable struct ColPackColoring
-    refColPack::Vector{Ptr{Cvoid}}
+    refColPack::Base.RefValue{Ptr{Cvoid}}
     coloring::Vector{Cint}
     method::ColoringMethod
     order::ColoringOrder
@@ -41,7 +41,7 @@ mutable struct ColPackColoring
 end
 
 function free_coloring(g::ColPackColoring)
-    ccall((:free_coloring, libcolpack), Cvoid, (Ptr{Cvoid},), g.refColPack)
+    @ccall libcolpack.free_coloring(g.refColPack::Ptr{Cvoid})::Cvoid
     return nothing
 end
 
@@ -65,7 +65,7 @@ function ColPackColoring(
         error("ColPack coloring failed.")
     end
 
-    g = ColPackColoring(refColPack, zeros(Int, reflen[1]), method, order, nothing)
+    g = ColPackColoring(refColPack, zeros(Int, reflen[]), method, order, nothing)
     finalizer(free_coloring, g)
     return g
 end
@@ -91,7 +91,7 @@ function ColPackColoring(
     end
     nrows = size(M, 2)
     reflen = Ref{Cint}(0)
-    refColPack = Vector{Ptr{Cvoid}}([C_NULL])
+    refColPack = Ref{Ptr{Cvoid}}(C_NULL)
     ret = @ccall libcolpack.build_coloring_from_csr(
         refColPack::Ptr{Cvoid},
         reflen::Ptr{Cint},
@@ -105,7 +105,7 @@ function ColPackColoring(
         error("ColPack coloring failed.")
     end
 
-    g = ColPackColoring(refColPack, zeros(Int, reflen[1]), method, order, csr)
+    g = ColPackColoring(refColPack, zeros(Int, reflen[]), method, order, csr)
     finalizer(free_coloring, g)
     return g
 end
@@ -116,15 +116,12 @@ end
 Retrieve the colors from a [`ColPackColoring`](@ref) as a vector of integers.
 """
 function get_colors(coloring::ColPackColoring; verbose=false)
-    ccall(
-        (:get_colors, libcolpack),
-        Cvoid,
-        (Ptr{Cvoid}, Ptr{Cdouble}, Cstring, Cint),
-        coloring.refColPack[1],
-        coloring.coloring,
-        coloring.method.method,
-        Cint(verbose),
-    )
+    @ccall libcolpack.get_colors(
+        coloring.refColPack[]::Ptr{Cvoid},
+        coloring.coloring::Ptr{Cdouble},  # TODO: should this be Cint?
+        coloring.method.method::Cstring,
+        verbose::Cint,
+    )::Cvoid
     # Julia colorings should be base 1
     return coloring.coloring .+ 1
 end
