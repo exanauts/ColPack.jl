@@ -1,6 +1,6 @@
 name = "ColPack"
 uuid = "ffa27691-3a59-46ab-a8d4-551f45b8d401"
-authors = ["Michel Schanen <Michel.Schanen@gmail.com>"]
+authors = ["Michel Schanen <Michel.Schanen@gmail.com>", "Guillaume Dalle"]
 version = "0.4.0"
 
 [deps]
