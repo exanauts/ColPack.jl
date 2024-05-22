@@ -1,5 +1,6 @@
 """
-        _cols_by_rows(rows_index,cols_index)
+        _cols_by_rows(rows_index, cols_index)
+
 Returns a vector of rows where each row contains
 a vector of its column indices.
 """
@@ -12,9 +13,9 @@ function _cols_by_rows(rows_index,cols_index)
     return cols_by_rows
 end
 
-
 """
-        _rows_by_cols(rows_index,cols_index)
+        _rows_by_cols(rows_index, cols_index)
+
 Returns a vector of columns where each column contains
 a vector of its row indices.
 """
@@ -22,7 +23,12 @@ function _rows_by_cols(rows_index,cols_index)
     return _cols_by_rows(cols_index,rows_index)
 end
 
-function matrix2adjmatrix(M; partition_by_rows = true)
+"""
+    matrix2adjmatrix(M::AbstractMatrix; partition_by_rows=true)
+
+Create an adjacency matrix between the rows or between the columns of `M`, depending on whether `partition_by_rows` is `true` or `false`.
+"""
+function matrix2adjmatrix(M::AbstractMatrix; partition_by_rows = true)
     (rows_index, cols_index, _) = findnz(M)
     if partition_by_rows
         A = SparseMatrixCSC{Float64, Cuint}(size(M,1), size(M,1), ones(Cuint, size(M,1)+1), Vector{Cuint}(), Vector{Float64}())

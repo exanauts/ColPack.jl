@@ -1,32 +1,22 @@
 # ColPack
-[![][build-stable-img]][build-url]
 
-This is the Julia interface to [ColPack](https://github.com/CSCsw/ColPack).
+[![Build Status](https://github.com/michel2323/ColPack.jl/actions/workflows/Test.yml/badge.svg?branch=master)](https://github.com/michel2323/ColPack.jl/actions/workflows/Test.yml?query=branch%master)
+[![Dev Documentation](https://img.shields.io/badge/docs-dev-blue.svg)](https://michel2323.github.io/ColPack.jl/dev/)
 
-## Usage
-### Jacobian coloring by columns
+This is the Julia interface to [ColPack](https://github.com/CSCsw/ColPack) for graph and matrix coloring.
+
+## Getting started
+
+You can install this package by running the following command in a Julia Pkg REPL (the necessary binaries will be downloaded automatically):
+
 ```julia
-using ColPack
-using SparseArrays
-
-# Example matrix/Jacobian
-A = [
-    [1.0 1.0 0.0 0.0 0.0];
-    [0.0 0.0 1.0 0.0 0.0];
-    [0.0 1.0 0.0 1.0 0.0];
-    [0.0 0.0 0.0 1.0 1.0];
-]
-
-A = sparse(A)
-
-# Create adjacency matrix for column coloring
-adjA = ColPack.matrix2adjmatrix(A; partition_by_rows=false)
-
-coloring = ColPackColoring(adjA, d1_coloring(), random_ordering())
-println("Number of colors: ", length(unique(get_colors(coloring))))
-println("Vector of vertex colors: ", get_colors(coloring))
+pkg> add ColPack
 ```
 
+Take a look at the tutorial in the documentation to get a feel for what you can do.
 
-[build-url]: https://github.com/michel2323/ColPack.jl/actions?query=workflow
-[build-stable-img]: https://github.com/michel2323/ColPack.jl/workflows/Run%20tests/badge.svg?branch=master
+## Mathematical background
+
+To understand the link between graph coloring and automatic differentiation, read the following survey:
+
+> [_What Color Is Your Jacobian? Graph Coloring for Computing Derivatives_](https://epubs.siam.org/doi/10.1137/S0036144504444711), Gebremedhin et al. (2005)
