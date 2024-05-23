@@ -1,3 +1,6 @@
 [deps]
 ColPack = "ffa27691-3a59-46ab-a8d4-551f45b8d401"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+
+[compat]
+Documenter = "1.3"

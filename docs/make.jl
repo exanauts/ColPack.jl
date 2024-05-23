@@ -5,7 +5,7 @@ cp(joinpath(@__DIR__, "..", "README.md"), joinpath(@__DIR__, "src", "index.md");
 
 makedocs(;
     modules=[ColPack],
-    authors=["Michel Schanen", "Guillaume Dalle"],
+    authors="Michel Schanen, Guillaume Dalle",
     sitename="ColPack.jl",
     format=Documenter.HTML(),
     pages=["Home" => "index.md", "Tutorial" => "tutorial.md", "API reference" => "api.md"],
