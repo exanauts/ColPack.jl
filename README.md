@@ -1,7 +1,8 @@
 # ColPack
 
-[![Build Status](https://github.com/michel2323/ColPack.jl/actions/workflows/Test.yml/badge.svg?branch=master)](https://github.com/michel2323/ColPack.jl/actions/workflows/Test.yml?query=branch%master)
-[![Dev Documentation](https://img.shields.io/badge/docs-dev-blue.svg)](https://michel2323.github.io/ColPack.jl/dev/)
+[![Build Status](https://github.com/exanauts/ColPack.jl/actions/workflows/Test.yml/badge.svg?branch=master)](https://github.com/exanauts/ColPack.jl/actions/workflows/Test.yml?query=branch%master)
+[![Stable Documentation](https://img.shields.io/badge/docs-stable-blue.svg)](https://exanauts.github.io/ColPack.jl/stable/)
+[![Dev Documentation](https://img.shields.io/badge/docs-dev-blue.svg)](https://exanauts.github.io/ColPack.jl/dev/)
 
 This is the Julia interface to [ColPack](https://github.com/CSCsw/ColPack) for graph and matrix coloring.
 

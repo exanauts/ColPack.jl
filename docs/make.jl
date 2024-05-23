@@ -5,17 +5,10 @@ cp(joinpath(@__DIR__, "..", "README.md"), joinpath(@__DIR__, "src", "index.md");
 
 makedocs(;
     modules=[ColPack],
-    authors="Michel Schanen",
+    authors="Michel Schanen, Guillaume Dalle",
     sitename="ColPack.jl",
     format=Documenter.HTML(),
-    pages=[
-        "Home" => "index.md",
-        "Tutorial" => "tutorial.md",
-        "API reference" => "api.md",
-    ],
+    pages=["Home" => "index.md", "Tutorial" => "tutorial.md", "API reference" => "api.md"],
 )
 
-deploydocs(;
-    repo="github.com/michel2323/ColPack.jl",
-    devbranch="master",
-)
+deploydocs(; repo="github.com/exanauts/ColPack.jl", devbranch="master")
