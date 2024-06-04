@@ -13,14 +13,14 @@ The fields of this struct are not part of the public API, they are only useful t
         filename::AbstractString,
         method::ColoringMethod,
         order::ColoringOrder;
-        verbose::Bool=false    
+        verbose::Bool=false
     )
 
     ColPackColoring(
         M::SparseMatrixCSC,
         method::ColoringMethod,
         order::ColoringOrder;
-        verbose::Bool=false    
+        verbose::Bool=false
     )
 
 Perform the coloring of a matrix that is either given directly or read from a file.
@@ -76,7 +76,6 @@ function ColPackColoring(
     order::ColoringOrder;
     verbose::Bool=false,
 ) where {VT,IT}
-    @assert issymmetric(M)
     csr = Vector{Ref{Cuint}}()
     csr_mem = Vector{Vector{Cuint}}()
     for i in 1:(length(M.colptr) - 1)
