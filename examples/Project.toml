@@ -1,0 +1,8 @@
+[deps]
+ColPack = "ffa27691-3a59-46ab-a8d4-551f45b8d401"
+ColPack_jll = "f218ff0c-cb54-5151-80c4-c0f62c730ce6"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+MatrixMarket = "4d4711f2-db25-561a-b6b3-d35e7d4047d3"
+SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+SparseDiffTools = "47a9eef4-7e08-11e9-0b38-333d64bd3804"
+SuiteSparseMatrixCollection = "ac199af8-68bc-55b8-82c4-7abd6f96ed98"

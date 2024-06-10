@@ -40,10 +40,7 @@ mutable struct ColPackColoring
     csr::Union{Vector{Ptr{Cuint}},Nothing}
 end
 
-function free_coloring(g::ColPackColoring)
-    @ccall libcolpack.free_coloring(g.refColPack::Ptr{Cvoid})::Cvoid
-    return nothing
-end
+Base.unsafe_convert(::Type{Ptr{Cvoid}}, coloring::ColPackColoring) = coloring.refColPack[]
 
 function ColPackColoring(
     filename::AbstractString,
@@ -51,21 +48,12 @@ function ColPackColoring(
     order::ColoringOrder;
     verbose::Bool=false,
 )
-    reflen = Vector{Cint}([Cint(0)])
     refColPack = Ref{Ptr{Cvoid}}(C_NULL)
-    ret = @ccall libcolpack.build_coloring(
-        refColPack::Ptr{Cvoid},
-        reflen::Ptr{Cint},
-        filename::Cstring,
-        method.method::Cstring,
-        order.order::Cstring,
-        verbose::Cint,
-    )::Cint
-    if ret == 0
-        error("ColPack coloring failed.")
-    end
-
-    g = ColPackColoring(refColPack, zeros(Int, reflen[]), method, order, nothing)
+    reflen = Ref{Cint}(0)
+    ret = build_coloring_from_file(refColPack, reflen, filename, method.method, order.order, verbose)
+    (ret == 0) && error("ColPack coloring failed.")
+    coloring = zeros(Cint, reflen[])
+    g = ColPackColoring(refColPack, coloring, method, order, nothing)
     finalizer(free_coloring, g)
     return g
 end
@@ -92,36 +80,22 @@ function ColPackColoring(
     nrows = size(M, 2)
     reflen = Ref{Cint}(0)
     refColPack = Ref{Ptr{Cvoid}}(C_NULL)
-    ret = @ccall libcolpack.build_coloring_from_csr(
-        refColPack::Ptr{Cvoid},
-        reflen::Ptr{Cint},
-        csr::Ref{Ptr{Cuint}},
-        nrows::Cint,
-        method.method::Cstring,
-        order.order::Cstring,
-        verbose::Cint,
-    )::Cint
-    if ret == 0
-        error("ColPack coloring failed.")
-    end
+    ret = build_coloring_from_csr(refColPack, reflen, csr, nrows, method.method, order.order, verbose)
+    (ret == 0) && error("ColPack coloring failed.")
 
-    g = ColPackColoring(refColPack, zeros(Int, reflen[]), method, order, csr)
+    coloring = zeros(Cint, reflen[])
+    g = ColPackColoring(refColPack, coloring, method, order, csr)
     finalizer(free_coloring, g)
     return g
 end
 
 """
-    get_colors(coloring::ColPackColoring; verbose=false)
+    get_colors(coloring::ColPackColoring)
 
 Retrieve the colors from a [`ColPackColoring`](@ref) as a vector of integers.
 """
-function get_colors(coloring::ColPackColoring; verbose=false)
-    @ccall libcolpack.get_colors(
-        coloring.refColPack[]::Ptr{Cvoid},
-        coloring.coloring::Ptr{Cdouble},  # TODO: should this be Cint?
-        coloring.method.method::Cstring,
-        verbose::Cint,
-    )::Cvoid
-    # Julia colorings should be base 1
-    return coloring.coloring .+ 1
+function get_colors(coloring::ColPackColoring)
+    get_coloring(coloring.refColPack[], coloring.coloring)
+    coloring.coloring .+= Cint(1)
+    return coloring.coloring
 end

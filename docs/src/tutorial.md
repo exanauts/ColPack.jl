@@ -27,7 +27,7 @@ julia> adjJ = ColPack.matrix2adjmatrix(J; partition_by_rows=false)
 julia> coloring = ColPackColoring(adjJ, d1_coloring(), natural_ordering());
 
 julia> colors = get_colors(coloring)
-5-element Vector{Int64}:
+5-element Vector{Int32}:
  1
  2
  1
