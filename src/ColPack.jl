@@ -8,6 +8,7 @@ using SparseArrays
 
 # Definitions
 
+include("libcolpack.jl")
 include("method.jl")
 include("order.jl")
 include("utils.jl")

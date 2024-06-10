@@ -21,7 +21,7 @@ push!(orderings, incidence_degree_ordering())
 push!(orderings, distance_two_incidence_degree_ordering())
 # push!(orderings, random_ordering())
 
-ncolors = Vector{Int}()
+ncolors = Vector{Cint}()
 
 push!(ncolors, 7)
 push!(ncolors, 7)

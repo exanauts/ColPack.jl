@@ -13,6 +13,8 @@ Represent a [ColPack](https://github.com/CSCsw/ColPack)-compatible [coloring met
 - [`d2_coloring()`](@ref)
 - [`acyclic_coloring()`](@ref)
 - [`star_coloring()`](@ref)
+- [`row_partial_d2_coloring()`](@ref)
+- [`column_partial_d2_coloring()`](@ref)
 """
 struct ColoringMethod
     method::String
@@ -45,3 +47,17 @@ acyclic_coloring() = ColoringMethod("ACYCLIC")
 Shortcut for `ColoringMethod("STAR")`.
 """
 star_coloring() = ColoringMethod("STAR")
+
+"""
+    row_partial_d2_coloring()
+
+Shortcut for `ColoringMethod("ROW_PARTIAL_DISTANCE_TWO")`.
+"""
+row_partial_d2_coloring() = ColoringMethod("ROW_PARTIAL_DISTANCE_TWO")
+
+"""
+    column_partial_d2_coloring()
+
+Shortcut for `ColoringMethod("COLUMN_PARTIAL_DISTANCE_TWO")`.
+"""
+column_partial_d2_coloring() = ColoringMethod("COLUMN_PARTIAL_DISTANCE_TWO")
