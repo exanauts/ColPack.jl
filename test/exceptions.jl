@@ -1,4 +1,5 @@
 using ColPack
+using ColPack: ColPackBiColoring
 using SparseArrays
 using Test
 

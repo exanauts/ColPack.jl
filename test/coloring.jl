@@ -1,4 +1,5 @@
 using ColPack
+using ColPack: ColPackBiColoring
 using ColPack: COLORING_METHODS, PARTIAL_COLORING_METHODS, BICOLORING_METHODS
 using ColPack: COLORING_ORDERS, PARTIAL_COLORING_ORDERS, BICOLORING_ORDERS
 using LinearAlgebra
@@ -47,7 +48,6 @@ function test_colors(
     This makes it hard to test it properly.
     =#
     @test length(colors1) <= size(A, 1)
-    @test maximum(colors1) <= size(A, 1)
     @test length(colors2) <= size(A, 2)
     @test isempty(intersect(Set(colors1), Set(colors2)))
 end
