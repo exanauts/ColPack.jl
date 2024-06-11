@@ -35,3 +35,30 @@ end
 
 colors_colpack = get_colors(colpack_coloring)
 ncolors_colpack = maximum(colors_colpack)
+
+method = row_partial_d2_coloring()
+@time colpack_partial_coloring1 = ColPackPartialColoring(paths[1], method, natural_ordering(); verbose)
+colors_row = get_colors(colpack_partial_coloring1)
+maximum(colors_row)
+
+method = column_partial_d2_coloring()
+@time colpack_partial_coloring2 = ColPackPartialColoring(paths[1], method, natural_ordering(); verbose)
+colors_column = get_colors(colpack_partial_coloring2)
+maximum(colors_column)
+
+method = row_partial_d2_coloring()
+@time colpack_partial_coloring1 = ColPackPartialColoring(A, method, natural_ordering(); verbose)
+colors_row2 = get_colors(colpack_partial_coloring1)
+maximum(colors_row2)
+
+method = column_partial_d2_coloring()
+@time colpack_partial_coloring2 = ColPackPartialColoring(A, method, natural_ordering(); verbose)
+colors_column2 = get_colors(colpack_partial_coloring2)
+maximum(colors_column2)
+
+method = implicit_star_bicoloring()
+# method = explicit_star_bicoloring()
+# method = explicit_modified_star_bicoloring()
+# method = implicit_greedy_star_bicoloring()
+@time colpack_bicoloring = ColPackBiColoring(paths[1], method, random_ordering(); verbose)
+colors1, colors2 = get_colors(colpack_bicoloring)
