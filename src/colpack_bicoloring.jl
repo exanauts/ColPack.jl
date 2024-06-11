@@ -3,13 +3,16 @@
 
 Struct holding the parameters of a bicoloring as well as its results (which can be queried with [`get_colors`](@ref)).
 
+!!! danger
+    This is still experimental and not protected by semantic versioning, use at your own risk.
+
 # Constructors
 
-ColPackBiColoring(
-    filename::AbstractString,
-    method::String,
-    order::String;
-    verbose::Bool=false    
+    ColPackBiColoring(
+        filename::AbstractString,
+        method::String,
+        order::String;
+        verbose::Bool=false    
     )
     
     ColPackBiColoring(
@@ -66,7 +69,7 @@ end
 """
     get_colors(coloring::ColPackBiColoring)
 
-Retrieve the colors from a [`ColPackBiColoring`](@ref) as two vectors of integers.
+Retrieve the colors from a [`ColPackBiColoring`](@ref) as two vectors of integers, one for the rows and one for the columns respectively.
 """
 function get_colors(coloring::ColPackBiColoring)
     get_bicoloring(coloring.refColPack[], coloring.coloring1, coloring.coloring2)
