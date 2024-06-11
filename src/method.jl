@@ -15,6 +15,10 @@ Represent a [ColPack](https://github.com/CSCsw/ColPack)-compatible [coloring met
 - [`star_coloring()`](@ref)
 - [`row_partial_d2_coloring()`](@ref)
 - [`column_partial_d2_coloring()`](@ref)
+- [`implicit_star_bicoloring()`](@ref)
+- [`explicit_star_bicoloring()`](@ref)
+- [`explicit_modified_star_bicoloring()`](@ref)
+- [`implicit_greedy_star_bicoloring()`](@ref)
 """
 struct ColoringMethod
     method::String
@@ -61,3 +65,31 @@ row_partial_d2_coloring() = ColoringMethod("ROW_PARTIAL_DISTANCE_TWO")
 Shortcut for `ColoringMethod("COLUMN_PARTIAL_DISTANCE_TWO")`.
 """
 column_partial_d2_coloring() = ColoringMethod("COLUMN_PARTIAL_DISTANCE_TWO")
+
+"""
+    implicit_star_bicoloring()
+
+Shortcut for `ColoringMethod("IMPLICIT_COVERING__STAR_BICOLORING")`.
+"""
+implicit_star_bicoloring() = ColoringMethod("IMPLICIT_COVERING__STAR_BICOLORING")
+
+"""
+    explicit_star_bicoloring()
+
+Shortcut for `ColoringMethod("EXPLICIT_COVERING__STAR_BICOLORING")`.
+"""
+explicit_star_bicoloring() = ColoringMethod("EXPLICIT_COVERING__STAR_BICOLORING")
+
+"""
+    explicit_modified_star_bicoloring()
+
+Shortcut for `ColoringMethod("EXPLICIT_COVERING__MODIFIED_STAR_BICOLORING")`.
+"""
+explicit_modified_star_bicoloring() = ColoringMethod("EXPLICIT_COVERING__MODIFIED_STAR_BICOLORING")
+
+"""
+    implicit_greedy_star_bicoloring()
+
+Shortcut for `ColoringMethod(IMPLICIT_COVERING__GREEDY_STAR_BICOLORING")`.
+"""
+implicit_greedy_star_bicoloring() = ColoringMethod("IMPLICIT_COVERING__GREEDY_STAR_BICOLORING")

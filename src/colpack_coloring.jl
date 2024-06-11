@@ -37,7 +37,6 @@ mutable struct ColPackColoring
     coloring::Vector{Cint}
     method::ColoringMethod
     order::ColoringOrder
-    csr::Union{Vector{Ptr{Cuint}},Nothing}
 end
 
 Base.unsafe_convert(::Type{Ptr{Cvoid}}, coloring::ColPackColoring) = coloring.refColPack[]
@@ -53,18 +52,18 @@ function ColPackColoring(
     ret = build_coloring_from_file(refColPack, reflen, filename, method.method, order.order, verbose)
     (ret == 0) && error("ColPack coloring failed.")
     coloring = zeros(Cint, reflen[])
-    g = ColPackColoring(refColPack, coloring, method, order, nothing)
+    g = ColPackColoring(refColPack, coloring, method, order)
     finalizer(free_coloring, g)
     return g
 end
 
 function ColPackColoring(
-    M::SparseMatrixCSC{VT,IT},
+    M::SparseMatrixCSC,
     method::ColoringMethod,
     order::ColoringOrder;
-    verbose::Bool=false,
-) where {VT,IT}
-    @assert issymmetric(M)
+    verbose::Bool=false
+)
+    # We expect M to be symmetric.
     csr = Vector{Ref{Cuint}}()
     csr_mem = Vector{Vector{Cuint}}()
     for i in 1:(length(M.colptr) - 1)
@@ -80,11 +79,11 @@ function ColPackColoring(
     nrows = size(M, 2)
     reflen = Ref{Cint}(0)
     refColPack = Ref{Ptr{Cvoid}}(C_NULL)
-    ret = build_coloring_from_csr(refColPack, reflen, csr, nrows, method.method, order.order, verbose)
+    ret = build_coloring_from_adolc(refColPack, reflen, csr, nrows, method.method, order.order, verbose)
     (ret == 0) && error("ColPack coloring failed.")
 
     coloring = zeros(Cint, reflen[])
-    g = ColPackColoring(refColPack, coloring, method, order, csr)
+    g = ColPackColoring(refColPack, coloring, method, order)
     finalizer(free_coloring, g)
     return g
 end

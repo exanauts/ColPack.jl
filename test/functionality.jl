@@ -43,16 +43,28 @@ MatrixMarket.mmwrite(filename, A)
 verbose = false
 
 @testset "MatrixMarket API" begin
-    @testset "$ordering" for (i, ordering) in enumerate(orderings)
+    @testset "Coloring -- $ordering" for (i, ordering) in enumerate(orderings)
         coloring = ColPackColoring(filename, d1_coloring(), ordering; verbose=verbose)
-        @test length(unique(get_colors(coloring))) == ncolors[i]
+        @test maximum(get_colors(coloring)) == ncolors[i]
+    end
+
+    @testset "Partial coloring -- $ordering" for (i, ordering) in enumerate(orderings)
+        row_coloring = ColPackPartialColoring(filename, row_partial_d2_coloring(), ordering; verbose=verbose)
+        column_coloring = ColPackPartialColoring(filename, column_partial_d2_coloring(), ordering; verbose=verbose)
     end
 end
 
 @testset "ADOL-C Compressed Row Storage" begin
-    @testset "$ordering" for (i, ordering) in enumerate(orderings)
+    @testset "Coloring -- $ordering" for (i, ordering) in enumerate(orderings)
         coloring = ColPackColoring(A, d1_coloring(), ordering; verbose=verbose)
-        @test length(unique(get_colors(coloring))) == ncolors[i]
+        @test maximum(get_colors(coloring)) == ncolors[i]
+    end
+end
+
+@testset "CSR Storage" begin
+    @testset "Partial coloring -- $ordering" for (i, ordering) in enumerate(orderings)
+        row_coloring = ColPackPartialColoring(A, row_partial_d2_coloring(), ordering; verbose=verbose)
+        column_coloring = ColPackPartialColoring(A, column_partial_d2_coloring(), ordering; verbose=verbose)
     end
 end
 
