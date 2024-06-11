@@ -26,6 +26,9 @@ The users needs to specify:
 - a partial coloring `method` among `$PARTIAL_COLORING_METHODS`
 - an `order` on the vertices among `$PARTIAL_COLORING_ORDERS`
 
+!!! warning
+    To perform a partial column coloring of a CSC matrix, we actually perform a partial row coloring of its transpose (which is a CSR matrix). Thus, the coloring results will in general differ between the file API and the matrix API.
+
 # Example
 
 ```jldoctest
