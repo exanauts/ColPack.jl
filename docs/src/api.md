@@ -1,30 +1,13 @@
+# API reference
+
 ```@meta
 CollapsedDocStrings = true
 ```
 
-# API reference
-
-## Entry points
+## Public
 
 ```@autodocs
 Modules = [ColPack]
-Pages = ["colpackcoloring.jl", "utils.jl"]
-Private = false
-```
-
-## Coloring method
-
-```@autodocs
-Modules = [ColPack]
-Pages = ["method.jl"]
-Private = false
-```
-
-## Coloring order
-
-```@autodocs
-Modules = [ColPack]
-Pages = ["order.jl"]
 Private = false
 ```
 

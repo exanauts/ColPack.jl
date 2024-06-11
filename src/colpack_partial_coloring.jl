@@ -3,53 +3,85 @@
 
 Struct holding the parameters of a partial coloring as well as its results (which can be queried with [`get_colors`](@ref)).
 
-# Fields
-
-The fields of this struct are not part of the public API, they are only useful to interface with the C++ library [ColPack](https://github.com/CSCsw/ColPack).
-
 # Constructors
 
     ColPackPartialColoring(
         filename::AbstractString,
-        method::ColoringMethod,
-        order::ColoringOrder;
+        method::String,
+        order::String;
         verbose::Bool=false    
     )
 
     ColPackPartialColoring(
         M::SparseMatrixCSC,
-        method::ColoringMethod,
-        order::ColoringOrder;
+        method::String,
+        order::String;
         verbose::Bool=false    
     )
 
-Perform the partial coloring of a matrix that is either given directly or read from a file.
+Perform the partial coloring of a matrix that is either given directly or read from a `.mtx` file.
 
-The users needs to specify a partial coloring `method` and an `order` on the vertices.
+The users needs to specify:
 
-# See also
+- a partial coloring `method` among `$PARTIAL_COLORING_METHODS`
+- an `order` on the vertices among `$PARTIAL_COLORING_ORDERS`
 
-- [`ColoringMethod`](@ref)
-- [`ColoringOrder`](@ref)
+# Example
+
+```jldoctest
+julia> using ColPack, SparseArrays
+
+julia> J = sparse([1 0 1; 1 1 0])
+2×3 SparseMatrixCSC{Int64, Int64} with 4 stored entries:
+ 1  ⋅  1
+ 1  1  ⋅
+
+julia> get_colors(ColPackPartialColoring(J, "COLUMN_PARTIAL_DISTANCE_TWO", "NATURAL"))
+3-element Vector{Int32}:
+ 1
+ 2
+ 2
+```
+
+# Fields
+
+The fields of this struct are not part of the public API, they are only useful to interface with the C++ library [ColPack](https://github.com/CSCsw/ColPack).
 """
 mutable struct ColPackPartialColoring
     refColPack::Base.RefValue{Ptr{Cvoid}}
     coloring::Vector{Cint}
-    method::ColoringMethod
-    order::ColoringOrder
+    method::String
+    order::String
 end
 
-Base.unsafe_convert(::Type{Ptr{Cvoid}}, coloring::ColPackPartialColoring) = coloring.refColPack[]
+function Base.unsafe_convert(::Type{Ptr{Cvoid}}, coloring::ColPackPartialColoring)
+    return coloring.refColPack[]
+end
+
+function switch(method::String)
+    if method == "ROW_PARTIAL_DISTANCE_TWO"
+        return "COLUMN_PARTIAL_DISTANCE_TWO"
+    elseif method == "COLUMN_PARTIAL_DISTANCE_TWO"
+        return "ROW_PARTIAL_DISTANCE_TWO"
+    else
+        throw(ArgumentError("Invalid method"))
+    end
+end
 
 function ColPackPartialColoring(
-    filename::AbstractString,
-    method::ColoringMethod,
-    order::ColoringOrder;
-    verbose::Bool=false,
+    filename::AbstractString, method::String, order::String; verbose::Bool=false
 )
+    if !(method in PARTIAL_COLORING_METHODS)
+        throw(ArgumentError("""Method "$method" is not in $PARTIAL_COLORING_METHODS"""))
+    end
+    if !(order in PARTIAL_COLORING_ORDERS)
+        throw(ArgumentError("""Order "$order" is not in $PARTIAL_COLORING_ORDERS"""))
+    end
     refColPack = Ref{Ptr{Cvoid}}(C_NULL)
     reflen = Ref{Cint}(0)
-    ret = build_partial_coloring_from_file(refColPack, reflen, filename, method.method, order.order, verbose)
+    ret = build_partial_coloring_from_file(
+        refColPack, reflen, filename, method, order, verbose
+    )
     (ret == 0) && error("ColPack partial coloring failed.")
     coloring = zeros(Cint, reflen[])
     g = ColPackPartialColoring(refColPack, coloring, method, order)
@@ -58,11 +90,14 @@ function ColPackPartialColoring(
 end
 
 function ColPackPartialColoring(
-    M::SparseMatrixCSC,
-    method::ColoringMethod,
-    order::ColoringOrder;
-    verbose::Bool=false,
+    M::SparseMatrixCSC, method::String, order::String; verbose::Bool=false
 )
+    if !(method in PARTIAL_COLORING_METHODS)
+        throw(ArgumentError("""Method "$method" is not in $PARTIAL_COLORING_METHODS"""))
+    end
+    if !(order in PARTIAL_COLORING_ORDERS)
+        throw(ArgumentError("""Order "$order" is not in $PARTIAL_COLORING_ORDERS"""))
+    end
     reflen = Ref{Cint}(0)
     refColPack = Ref{Ptr{Cvoid}}(C_NULL)
     nrows, ncols = size(M)
@@ -75,12 +110,12 @@ function ColPackPartialColoring(
     Mt_cols .-= Cint(1)
     Mt_rows .-= Cint(1)
 
-    (method.method == "ROW_PARTIAL_DISTANCE_TWO") && (colpack_method = "COLUMN_PARTIAL_DISTANCE_TWO")
-    (method.method == "COLUMN_PARTIAL_DISTANCE_TWO") && (colpack_method = "ROW_PARTIAL_DISTANCE_TWO")
-    ret = build_partial_coloring_from_csr(refColPack, reflen, Mt_rows, Mt_cols, ncols, nrows, colpack_method, order.order, verbose)
+    ret = build_partial_coloring_from_csr(
+        refColPack, reflen, Mt_rows, Mt_cols, ncols, nrows, switch(method), order, verbose
+    )
     (ret == 0) && error("ColPack partial coloring failed.")
     coloring = zeros(Cint, reflen[])
-    g = ColPackPartialColoring(refColPack, coloring, ColoringMethod(colpack_method), order)
+    g = ColPackPartialColoring(refColPack, coloring, switch(method), order)
     finalizer(free_partial_coloring, g)
     return g
 end

@@ -16,7 +16,10 @@ using Test
     @testset "Doctests" begin
         Documenter.doctest(ColPack)
     end
-    @testset verbose = true "Functionality" begin
-        include("functionality.jl")
+    @testset verbose = true "Coloring" begin
+        include("coloring.jl")
+    end
+    @testset verbose = true "Exceptions" begin
+        include("exceptions.jl")
     end
 end
