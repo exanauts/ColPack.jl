@@ -40,7 +40,6 @@ function test_colors(A::AbstractMatrix, method::String, colors::AbstractVector{<
         @test maximum(colors) <= size(A, 1)
     end
     if method in ["STAR", "COLUMN_PARTIAL_DISTANCE_TWO", "ROW_PARTIAL_DISTANCE_TWO"]
-        @test directly_recoverable_columns(A, colors; verbose=true)
         if method == "STAR"
             @test directly_recoverable_columns(A, colors; verbose=true)
             @test symmetrically_orthogonal_columns(A, colors; verbose=true)
@@ -98,7 +97,7 @@ end;
                     filename, method, order; verbose=false
                 )
                 @test length(get_colors(coloring_mat)) == length(get_colors(coloring_file))
-                # this is not always true since we use different algorithms
+                # this should be true but it isn't at the moment
                 # @test get_colors(coloring_mat) == get_colors(coloring_file)
                 test_colors(J, method, get_colors(coloring_mat))
                 test_colors(J, method, get_colors(coloring_file))
