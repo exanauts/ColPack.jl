@@ -15,7 +15,7 @@ using Test
 
 rng = StableRNG(62)
 
-samples = 10
+samples = 100
 
 asymmetric_params = vcat(
     [(10, 20, p) for p in (0.0:0.2:1.0)],  #
