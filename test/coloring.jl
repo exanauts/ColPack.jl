@@ -71,7 +71,7 @@ end;
 
 @testset verbose = true "Bipartite graph partial coloring" begin
     @testset "$method" for method in PARTIAL_COLORING_METHODS
-        @testset "$order" for order in PARTIAL_COLORING_ORDERS[1:1]
+        @testset "$order" for order in PARTIAL_COLORING_ORDERS
             @testset "(n, m, p) = $((n, m, p))" for (n, m, p) in asymmetric_params
                 J = sprand(rng, Bool, n, m, p)
                 filename = joinpath(@__DIR__, "J.mtx")
