@@ -6,21 +6,27 @@ using LinearAlgebra
 using MatrixMarket
 using Random
 using SparseArrays
+using SparseMatrixColorings:
+    directly_recoverable_columns,
+    structurally_orthogonal_columns,
+    symmetrically_orthogonal_columns
 using StableRNGs
 using Test
 
-rng = StableRNG(63)
+rng = StableRNG(62)
+
+samples = 100
 
 asymmetric_params = vcat(
-    [(10, 20, p) for p in (0.0:0.1:1.0)],  #
-    [(20, 10, p) for p in (0.0:0.1:1.0)],
-    [(100, 200, p) for p in (0.01:0.01:0.05)],  #
-    [(200, 100, p) for p in (0.01:0.01:0.05)],
+    [(10, 20, p) for p in (0.0:0.2:1.0)],  #
+    [(20, 10, p) for p in (0.0:0.2:1.0)],
+    [(100, 200, p) for p in (0.01:0.02:0.05)],  #
+    [(200, 100, p) for p in (0.01:0.02:0.05)],
 )
 
 symmetric_params = vcat(
-    [(10, p) for p in (0.0:0.1:1.0)], #
-    [(100, p) for p in (0.01:0.01:0.05)],
+    [(10, p) for p in (0.0:0.2:1.0)], #
+    [(100, p) for p in (0.01:0.02:0.05)],
 )
 
 function test_colors(A::AbstractMatrix, method::String, colors::AbstractVector{<:Integer})
@@ -34,6 +40,18 @@ function test_colors(A::AbstractMatrix, method::String, colors::AbstractVector{<
     else
         @test issymmetric(A)
         @test maximum(colors) <= size(A, 1)
+    end
+    if method in ["STAR", "COLUMN_PARTIAL_DISTANCE_TWO", "ROW_PARTIAL_DISTANCE_TWO"]
+        if method == "STAR"
+            @test directly_recoverable_columns(A, colors; verbose=true)
+            @test symmetrically_orthogonal_columns(A, colors; verbose=true)
+        elseif method == "COLUMN_PARTIAL_DISTANCE_TWO"
+            @test directly_recoverable_columns(A, colors; verbose=true)
+            @test structurally_orthogonal_columns(A, colors; verbose=true)
+        elseif method == "ROW_PARTIAL_DISTANCE_TWO"
+            @test directly_recoverable_columns(transpose(A), colors; verbose=true)
+            @test structurally_orthogonal_columns(transpose(A), colors; verbose=true)
+        end
     end
 end
 
@@ -54,16 +72,18 @@ end
 
 @testset verbose = true "General graph coloring" begin
     @testset "$method" for method in COLORING_METHODS
-        @testset "$order" for order in COLORING_ORDERS
-            @testset "(n, p) = $((n, p))" for (n, p) in symmetric_params
+        @testset "(n, p) = $((n, p))" for (n, p) in symmetric_params
+            for _ in 1:samples
                 H = sparse(Symmetric(sprand(rng, Bool, n, n, p)))
                 filename = joinpath(@__DIR__, "H.mtx")
                 MatrixMarket.mmwrite(filename, H)
-                coloring_mat = ColPackColoring(H, method, order; verbose=false)
-                coloring_file = ColPackColoring(filename, method, order; verbose=false)
-                @test get_colors(coloring_mat) == get_colors(coloring_file)
-                colors = get_colors(coloring_file)
-                test_colors(H, method, colors)
+                for order in COLORING_ORDERS
+                    coloring_mat = ColPackColoring(H, method, order; verbose=false)
+                    coloring_file = ColPackColoring(filename, method, order; verbose=false)
+                    @test get_colors(coloring_mat) == get_colors(coloring_file)
+                    test_colors(H, method, get_colors(coloring_file))
+                    test_colors(H, method, get_colors(coloring_mat))
+                end
             end
         end
     end
@@ -71,20 +91,23 @@ end;
 
 @testset verbose = true "Bipartite graph partial coloring" begin
     @testset "$method" for method in PARTIAL_COLORING_METHODS
-        @testset "$order" for order in PARTIAL_COLORING_ORDERS
-            @testset "(n, m, p) = $((n, m, p))" for (n, m, p) in asymmetric_params
+        @testset "(n, m, p) = $((n, m, p))" for (n, m, p) in asymmetric_params
+            for _ in 1:samples
                 J = sprand(rng, Bool, n, m, p)
                 filename = joinpath(@__DIR__, "J.mtx")
                 MatrixMarket.mmwrite(filename, J)
-                coloring_mat = ColPackPartialColoring(J, method, order; verbose=false)
-                coloring_file = ColPackPartialColoring(
-                    filename, method, order; verbose=false
-                )
-                @test length(get_colors(coloring_mat)) == length(get_colors(coloring_file))
-                # this is not always true since we use different algorithms
-                # @test get_colors(coloring_mat) == get_colors(coloring_file)
-                test_colors(J, method, get_colors(coloring_mat))
-                test_colors(J, method, get_colors(coloring_file))
+                for order in PARTIAL_COLORING_ORDERS
+                    coloring_mat = ColPackPartialColoring(J, method, order; verbose=false)
+                    coloring_file = ColPackPartialColoring(
+                        filename, method, order; verbose=false
+                    )
+                    @test length(get_colors(coloring_mat)) ==
+                        length(get_colors(coloring_file))
+                    # this should be true but it isn't at the moment
+                    @test_skip get_colors(coloring_mat) == get_colors(coloring_file)
+                    test_colors(J, method, get_colors(coloring_file))
+                    test_colors(J, method, get_colors(coloring_mat))
+                end
             end
         end
     end
@@ -92,14 +115,18 @@ end;
 
 @testset verbose = true "Bipartite graph bicoloring" begin
     @testset "$method" for method in BICOLORING_METHODS
-        @testset "$order" for order in BICOLORING_ORDERS
-            @testset "(n, m, p) = $((n, m, p))" for (n, m, p) in asymmetric_params
+        @testset "(n, m, p) = $((n, m, p))" for (n, m, p) in asymmetric_params
+            for _ in 1:samples
                 J = sprand(rng, Bool, n, m, p)
                 filename = joinpath(@__DIR__, "J.mtx")
                 MatrixMarket.mmwrite(filename, J)
-                coloring_file = ColPackBiColoring(filename, method, order; verbose=false)
-                colors1, colors2 = get_colors(coloring_file)
-                test_colors(J, method, colors1, colors2)
+                for order in BICOLORING_ORDERS
+                    coloring_file = ColPackBiColoring(
+                        filename, method, order; verbose=false
+                    )
+                    colors1, colors2 = get_colors(coloring_file)
+                    test_colors(J, method, colors1, colors2)
+                end
             end
         end
     end
