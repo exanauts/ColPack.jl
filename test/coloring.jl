@@ -62,6 +62,7 @@ end
                 coloring_mat = ColPackColoring(H, method, order; verbose=false)
                 coloring_file = ColPackColoring(filename, method, order; verbose=false)
                 @test get_colors(coloring_mat) == get_colors(coloring_file)
+                @test ncolors(coloring_mat) == ncolors(coloring_file)
                 colors = get_colors(coloring_file)
                 test_colors(H, method, colors)
             end
@@ -81,6 +82,8 @@ end;
                     filename, method, order; verbose=false
                 )
                 @test length(get_colors(coloring_mat)) == length(get_colors(coloring_file))
+                @test ncolors(coloring_mat) ≥ 1
+                @test ncolors(coloring_file) ≥ 1
                 # this is not always true since we use different algorithms
                 # @test get_colors(coloring_mat) == get_colors(coloring_file)
                 test_colors(J, method, get_colors(coloring_mat))
@@ -98,6 +101,7 @@ end;
                 filename = joinpath(@__DIR__, "J.mtx")
                 MatrixMarket.mmwrite(filename, J)
                 coloring_file = ColPackBiColoring(filename, method, order; verbose=false)
+                @test ncolors(coloring_file) ≥ 1
                 colors1, colors2 = get_colors(coloring_file)
                 test_colors(J, method, colors1, colors2)
             end

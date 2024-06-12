@@ -123,3 +123,12 @@ function get_colors(coloring::ColPackColoring)
     coloring.coloring .+= Cint(1)
     return coloring.coloring
 end
+
+"""
+    ncolors(coloring::ColPackColoring)
+
+Retrieve the number of colors from a [`ColPackColoring`](@ref).
+"""
+function ncolors(coloring::ColPackColoring)
+    return ncolors_coloring(coloring.refColPack[])
+end
