@@ -29,6 +29,6 @@ include("colpack_bicoloring.jl")
 
 # Exports
 
-export ColPackColoring, ColPackPartialColoring, colpack, get_colors
+export ColPackColoring, ColPackPartialColoring, colpack, get_colors, ncolors
 
 end #module

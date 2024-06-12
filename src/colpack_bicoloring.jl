@@ -81,3 +81,12 @@ function get_colors(coloring::ColPackBiColoring)
     coloring.coloring2 .+= Cint(1)
     return coloring.coloring1, coloring.coloring2
 end
+
+"""
+    ncolors(coloring::ColPackBiColoring)
+
+Retrieve the number of colors from a [`ColPackBiColoring`](@ref).
+"""
+function ncolors(coloring::ColPackBiColoring)
+    return ncolors_bicoloring(coloring.refColPack[])
+end

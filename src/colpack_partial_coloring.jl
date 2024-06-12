@@ -133,3 +133,12 @@ function get_colors(coloring::ColPackPartialColoring)
     coloring.coloring .+= Cint(1)
     return coloring.coloring
 end
+
+"""
+    ncolors(coloring::ColPackPartialColoring)
+
+Retrieve the number of colors from a [`ColPackPartialColoring`](@ref).
+"""
+function ncolors(coloring::ColPackPartialColoring)
+    return ncolors_partial_coloring(coloring.refColPack[])
+end
