@@ -89,22 +89,11 @@ function ColPackColoring(
         throw(DimensionMismatch("Matrix must be square (and symmetric)"))
     end
     # We expect M to be symmetric.
-    csr = Vector{Ref{Cuint}}()
-    csr_mem = Vector{Vector{Cuint}}()
-    for i in 1:(length(M.colptr) - 1)
-        vec = Vector{Cuint}()
-        # Number of column elements
-        push!(vec, Cuint(M.colptr[i + 1] - M.colptr[i]))
-        for j in M.colptr[i]:(M.colptr[i + 1] - 1)
-            push!(vec, Cuint(M.rowval[j] - 1))
-        end
-        push!(csr, Base.unsafe_convert(Ptr{Cuint}, vec))
-        push!(csr_mem, vec)
-    end
+    adolc, adolc_mem = csr_to_adolc(M)
     nrows = size(M, 2)
     reflen = Ref{Cint}(0)
     refColPack = Ref{Ptr{Cvoid}}(C_NULL)
-    ret = build_coloring_from_adolc(refColPack, reflen, csr, nrows, method, order, verbose)
+    ret = build_coloring_from_adolc(refColPack, reflen, adolc, nrows, method, order, verbose)
     (ret == 0) && error("ColPack coloring failed.")
 
     coloring = zeros(Cint, reflen[])
@@ -122,4 +111,13 @@ function get_colors(coloring::ColPackColoring)
     get_coloring(coloring.refColPack[], coloring.coloring)
     coloring.coloring .+= Cint(1)
     return coloring.coloring
+end
+
+"""
+    ncolors(coloring::ColPackColoring)
+
+Retrieve the number of colors from a [`ColPackColoring`](@ref).
+"""
+function ncolors(coloring::ColPackColoring)
+    return ncolors_coloring(coloring.refColPack[])
 end
