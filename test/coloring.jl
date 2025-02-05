@@ -11,6 +11,8 @@ using Test
 
 rng = StableRNG(63)
 
+samples = 100
+
 asymmetric_params = vcat(
     [(10, 20, p) for p in (0.0:0.1:1.0)],  #
     [(20, 10, p) for p in (0.0:0.1:1.0)],
@@ -56,15 +58,17 @@ end
     @testset "$method" for method in COLORING_METHODS
         @testset "$order" for order in COLORING_ORDERS
             @testset "(n, p) = $((n, p))" for (n, p) in symmetric_params
-                H = sparse(Symmetric(sprand(rng, Bool, n, n, p)))
-                filename = joinpath(@__DIR__, "H.mtx")
-                MatrixMarket.mmwrite(filename, H)
-                coloring_mat = ColPackColoring(H, method, order; verbose=false)
-                coloring_file = ColPackColoring(filename, method, order; verbose=false)
-                @test get_colors(coloring_mat) == get_colors(coloring_file)
-                @test ncolors(coloring_mat) == ncolors(coloring_file)
-                colors = get_colors(coloring_file)
-                test_colors(H, method, colors)
+                for _ in 1:samples
+                    H = sparse(Symmetric(sprand(rng, Bool, n, n, p)))
+                    filename = joinpath(@__DIR__, "H.mtx")
+                    MatrixMarket.mmwrite(filename, H)
+                    coloring_mat = ColPackColoring(H, method, order; verbose=false)
+                    coloring_file = ColPackColoring(filename, method, order; verbose=false)
+                    @test get_colors(coloring_mat) == get_colors(coloring_file)
+                    @test ncolors(coloring_mat) == ncolors(coloring_file)
+                    colors = get_colors(coloring_file)
+                    test_colors(H, method, colors)
+                end
             end
         end
     end
@@ -74,20 +78,23 @@ end;
     @testset "$method" for method in PARTIAL_COLORING_METHODS
         @testset "$order" for order in PARTIAL_COLORING_ORDERS
             @testset "(n, m, p) = $((n, m, p))" for (n, m, p) in asymmetric_params
-                J = sprand(rng, Bool, n, m, p)
-                filename = joinpath(@__DIR__, "J.mtx")
-                MatrixMarket.mmwrite(filename, J)
-                coloring_mat = ColPackPartialColoring(J, method, order; verbose=false)
-                coloring_file = ColPackPartialColoring(
-                    filename, method, order; verbose=false
-                )
-                @test length(get_colors(coloring_mat)) == length(get_colors(coloring_file))
-                @test ncolors(coloring_mat) ≥ 1
-                @test ncolors(coloring_file) ≥ 1
-                # this is not always true since we use different algorithms
-                # @test get_colors(coloring_mat) == get_colors(coloring_file)
-                test_colors(J, method, get_colors(coloring_mat))
-                test_colors(J, method, get_colors(coloring_file))
+                for _ in 1:samples
+                    J = sprand(rng, Bool, n, m, p)
+                    filename = joinpath(@__DIR__, "J.mtx")
+                    MatrixMarket.mmwrite(filename, J)
+                    coloring_mat = ColPackPartialColoring(J, method, order; verbose=false)
+                    coloring_file = ColPackPartialColoring(
+                        filename, method, order; verbose=false
+                    )
+                    @test length(get_colors(coloring_mat)) ==
+                        length(get_colors(coloring_file))
+                    @test ncolors(coloring_mat) ≥ 1
+                    @test ncolors(coloring_file) ≥ 1
+                    # this is not always true since we use different algorithms
+                    # @test get_colors(coloring_mat) == get_colors(coloring_file)
+                    test_colors(J, method, get_colors(coloring_mat))
+                    test_colors(J, method, get_colors(coloring_file))
+                end
             end
         end
     end
@@ -97,13 +104,17 @@ end;
     @testset "$method" for method in BICOLORING_METHODS
         @testset "$order" for order in BICOLORING_ORDERS
             @testset "(n, m, p) = $((n, m, p))" for (n, m, p) in asymmetric_params
-                J = sprand(rng, Bool, n, m, p)
-                filename = joinpath(@__DIR__, "J.mtx")
-                MatrixMarket.mmwrite(filename, J)
-                coloring_file = ColPackBiColoring(filename, method, order; verbose=false)
-                @test ncolors(coloring_file) ≥ 1
-                colors1, colors2 = get_colors(coloring_file)
-                test_colors(J, method, colors1, colors2)
+                for _ in 1:samples
+                    J = sprand(rng, Bool, n, m, p)
+                    filename = joinpath(@__DIR__, "J.mtx")
+                    MatrixMarket.mmwrite(filename, J)
+                    coloring_file = ColPackBiColoring(
+                        filename, method, order; verbose=false
+                    )
+                    @test ncolors(coloring_file) ≥ 1
+                    colors1, colors2 = get_colors(coloring_file)
+                    test_colors(J, method, colors1, colors2)
+                end
             end
         end
     end
