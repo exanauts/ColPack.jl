@@ -8,7 +8,9 @@ A Julia interface to the C++ library [ColPack](https://github.com/CSCsw/ColPack)
 - [`ColPackColoring`](@ref)
 - [`ColPackPartialColoring`](@ref)
 - [`ColPackBiColoring`](@ref)
+- [`colpack`](@ref)
 - [`get_colors`](@ref)
+- [`ncolors`](@ref)
 """
 module ColPack
 
@@ -22,12 +24,14 @@ using SparseArrays
 
 include("libcolpack.jl")
 include("options.jl")
+include("utils.jl")
+include("colpack_binary.jl")
 include("colpack_coloring.jl")
 include("colpack_partial_coloring.jl")
 include("colpack_bicoloring.jl")
 
 # Exports
 
-export ColPackColoring, ColPackPartialColoring, get_colors
+export ColPackColoring, ColPackPartialColoring, ColPackBiColoring, colpack, get_colors, ncolors
 
 end #module
