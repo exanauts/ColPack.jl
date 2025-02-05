@@ -1,6 +1,6 @@
 name = "ColPack"
 uuid = "ffa27691-3a59-46ab-a8d4-551f45b8d401"
-authors = ["Michel Schanen <Michel.Schanen@gmail.com>", "Alexis Montoison", "Guillaume Dalle"]
+authors = ["Michel Schanen", "Alexis Montoison", "Guillaume Dalle"]
 version = "0.5.0"
 
 [deps]
@@ -11,7 +11,7 @@ SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [compat]
 ColPack_jll = "0.4.1"
-LinearAlgebra = "1.6"
-Random = "1.6"
-SparseArrays = "1.6"
-julia = "1.6"
+LinearAlgebra = "1.10"
+Random = "1.10"
+SparseArrays = "1.10"
+julia = "1.10"
