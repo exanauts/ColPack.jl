@@ -66,6 +66,39 @@ function ColPackBiColoring(
     return g
 end
 
+function ColPackBiColoring(
+    M::SparseMatrixCSC, method::String, order::String; verbose::Bool=false
+)
+    if !(method in BICOLORING_METHODS)
+        throw(ArgumentError("""Method "$method" is not in $BICOLORING_METHODS"""))
+    end
+    if !(order in BICOLORING_ORDERS)
+        throw(ArgumentError("""Order "$order" is not in $BICOLORING_ORDERS"""))
+    end
+    refColPack = Ref{Ptr{Cvoid}}(C_NULL)
+    reflen1 = Ref{Cint}(0)
+    reflen2 = Ref{Cint}(0)
+    nrows, ncols = size(M)
+
+    # Version adolc
+    # Mᵀ = sparse(M')
+    # adolc, adolc_mem = csr_to_adolc(Mᵀ)
+    # ret = build_bicoloring_from_adolc(refColPack, reflen1, reflen2, adolc, nrows, ncols, method, order, verbose)
+
+    # Version csc
+    # ColPack expects sparse CSC / CSR matrices with 0-based indexing.
+    rowval = Cint.(M.rowval) .- Cint(1)
+    colptr = Cint.(M.colptr) .- Cint(1)
+    ret = build_bicoloring_from_csc(refColPack, reflen1, reflen2, rowval, colptr, nrows, ncols, method, order, verbose)
+
+    (ret == 0) && error("ColPack partial coloring failed.")
+    coloring1 = zeros(Cint, reflen1[])
+    coloring2 = zeros(Cint, reflen2[])
+    g = ColPackBiColoring(refColPack, coloring1, coloring2, method, order)
+    finalizer(free_partial_coloring, g)
+    return g
+end
+
 """
     get_colors(coloring::ColPackBiColoring)
 
@@ -80,4 +113,13 @@ function get_colors(coloring::ColPackBiColoring)
     coloring.coloring1 .+= Cint(1)
     coloring.coloring2 .+= Cint(1)
     return coloring.coloring1, coloring.coloring2
+end
+
+"""
+    ncolors(coloring::ColPackBiColoring)
+
+Retrieve the number of colors from a [`ColPackBiColoring`](@ref).
+"""
+function ncolors(coloring::ColPackBiColoring)
+    return ncolors_bicoloring(coloring.refColPack[])
 end
