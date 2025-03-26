@@ -50,6 +50,7 @@ The fields of this struct are not part of the public API, they are only useful t
 """
 mutable struct ColPackColoring
     refColPack::Base.RefValue{Ptr{Cvoid}}
+    ordering::Vector{Cint}
     coloring::Vector{Cint}
     method::String
     order::String
@@ -70,8 +71,9 @@ function ColPackColoring(
     reflen = Ref{Cint}(0)
     ret = build_coloring_from_file(refColPack, reflen, filename, method, order, verbose)
     (ret == 0) && error("ColPack coloring failed.")
+    ordering = zeros(Cint, reflen[])
     coloring = zeros(Cint, reflen[])
-    g = ColPackColoring(refColPack, coloring, method, order)
+    g = ColPackColoring(refColPack, ordering, coloring, method, order)
     finalizer(free_coloring, g)
     return g
 end
@@ -95,11 +97,22 @@ function ColPackColoring(
     refColPack = Ref{Ptr{Cvoid}}(C_NULL)
     ret = build_coloring_from_adolc(refColPack, reflen, adolc, nrows, method, order, verbose)
     (ret == 0) && error("ColPack coloring failed.")
-
+    ordering = zeros(Cint, reflen[])
     coloring = zeros(Cint, reflen[])
-    g = ColPackColoring(refColPack, coloring, method, order)
+    g = ColPackColoring(refColPack, ordering, coloring, method, order)
     finalizer(free_coloring, g)
     return g
+end
+
+"""
+    get_ordering(coloring::ColPackColoring)
+
+Retrieve the ordering from a [`ColPackColoring`](@ref) as a vector of integers.
+"""
+function get_ordering(coloring::ColPackColoring)
+    order_coloring(coloring.refColPack[], coloring.ordering)
+    coloring.ordering .+= Cint(1)
+    return coloring.ordering
 end
 
 """
@@ -108,7 +121,7 @@ end
 Retrieve the colors from a [`ColPackColoring`](@ref) as a vector of integers.
 """
 function get_colors(coloring::ColPackColoring)
-    get_coloring(coloring.refColPack[], coloring.coloring)
+    colors_coloring(coloring.refColPack[], coloring.coloring)
     coloring.coloring .+= Cint(1)
     return coloring.coloring
 end
@@ -120,4 +133,22 @@ Retrieve the number of colors from a [`ColPackColoring`](@ref).
 """
 function ncolors(coloring::ColPackColoring)
     return ncolors_coloring(coloring.refColPack[])
+end
+
+"""
+    timer_ordering(coloring::ColPackColoring)
+
+Retrieve the timer for ordering from a [`ColPackColoring`](@ref).
+"""
+function timer_ordering(coloring::ColPackColoring)
+    return timer_order_coloring(coloring.refColPack[])
+end
+
+"""
+    timer_coloring(coloring::ColPackColoring)
+
+Retrieve the timer for coloring from a [`ColPackColoring`](@ref).
+"""
+function timer_coloring(coloring::ColPackColoring)
+    return timer_colors_coloring(coloring.refColPack[])
 end

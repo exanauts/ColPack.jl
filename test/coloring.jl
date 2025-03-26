@@ -65,6 +65,10 @@ end
                 @test ncolors(coloring_mat) == ncolors(coloring_file)
                 colors = get_colors(coloring_file)
                 test_colors(H, method, colors)
+                # @test timer_ordering(coloring_mat) > 0
+                # @test timer_ordering(coloring_file) > 0
+                # @test timer_coloring(coloring_mat) > 0
+                # @test timer_coloring(coloring_file) > 0
             end
         end
     end
@@ -88,6 +92,10 @@ end;
                 # @test get_colors(coloring_mat) == get_colors(coloring_file)
                 test_colors(J, method, get_colors(coloring_mat))
                 test_colors(J, method, get_colors(coloring_file))
+                # @test timer_ordering(coloring_mat) > 0
+                # @test timer_ordering(coloring_file) > 0
+                # @test timer_coloring(coloring_mat) > 0
+                # @test timer_coloring(coloring_file) > 0
             end
         end
     end
@@ -104,6 +112,8 @@ end;
                 @test ncolors(coloring_file) ≥ 1
                 colors1, colors2 = get_colors(coloring_file)
                 test_colors(J, method, colors1, colors2)
+                # @test timer_ordering(coloring_file) > 0
+                # @test timer_coloring(coloring_file) > 0
             end
         end
     end

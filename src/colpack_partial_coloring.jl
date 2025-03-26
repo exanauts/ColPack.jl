@@ -52,6 +52,7 @@ The fields of this struct are not part of the public API, they are only useful t
 """
 mutable struct ColPackPartialColoring
     refColPack::Base.RefValue{Ptr{Cvoid}}
+    ordering::Vector{Cint}
     coloring::Vector{Cint}
     method::String
     order::String
@@ -76,8 +77,9 @@ function ColPackPartialColoring(
         refColPack, reflen, filename, method, order, verbose
     )
     (ret == 0) && error("ColPack partial coloring failed.")
+    ordering = zeros(Cint, reflen[])
     coloring = zeros(Cint, reflen[])
-    g = ColPackPartialColoring(refColPack, coloring, method, order)
+    g = ColPackPartialColoring(refColPack, ordering, coloring, method, order)
     finalizer(free_partial_coloring, g)
     return g
 end
@@ -105,12 +107,23 @@ function ColPackPartialColoring(
     rowval = Cint.(M.rowval) .- Cint(1)
     colptr = Cint.(M.colptr) .- Cint(1)
     ret = build_partial_coloring_from_csc(refColPack, reflen, rowval, colptr, nrows, ncols, method, order, verbose)
-
     (ret == 0) && error("ColPack partial coloring failed.")
+    ordering = zeros(Cint, reflen[])
     coloring = zeros(Cint, reflen[])
-    g = ColPackPartialColoring(refColPack, coloring, method, order)
+    g = ColPackPartialColoring(refColPack, ordering, coloring, method, order)
     finalizer(free_partial_coloring, g)
     return g
+end
+
+"""
+    get_ordering(coloring::ColPackPartialColoring)
+
+Retrieve the ordering from a [`ColPackPartialColoring`](@ref) as a vector of integers.
+"""
+function get_ordering(coloring::ColPackPartialColoring)
+    order_partial_coloring(coloring.refColPack[], coloring.ordering)
+    coloring.ordering .+= Cint(1)
+    return coloring.ordering
 end
 
 """
@@ -119,7 +132,7 @@ end
 Retrieve the colors from a [`ColPackPartialColoring`](@ref) as a vector of integers.
 """
 function get_colors(coloring::ColPackPartialColoring)
-    get_partial_coloring(coloring.refColPack[], coloring.coloring)
+    colors_partial_coloring(coloring.refColPack[], coloring.coloring)
     coloring.coloring .+= Cint(1)
     return coloring.coloring
 end
@@ -131,4 +144,22 @@ Retrieve the number of colors from a [`ColPackPartialColoring`](@ref).
 """
 function ncolors(coloring::ColPackPartialColoring)
     return ncolors_partial_coloring(coloring.refColPack[])
+end
+
+"""
+    timer_ordering(coloring::ColPackPartialColoring)
+
+Retrieve the timer for ordering from a [`ColPackPartialColoring`](@ref).
+"""
+function timer_ordering(coloring::ColPackPartialColoring)
+    return timer_order_partial_coloring(coloring.refColPack[])
+end
+
+"""
+    timer_coloring(coloring::ColPackPartialColoring)
+
+Retrieve the timer for coloring from a [`ColPackPartialColoring`](@ref).
+"""
+function timer_coloring(coloring::ColPackPartialColoring)
+    return timer_colors_partial_coloring(coloring.refColPack[])
 end
