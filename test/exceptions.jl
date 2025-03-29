@@ -13,9 +13,9 @@ H = sparse(H_dense)
 @test get_colors(ColPackColoring(H, "STAR", "NATURAL")) isa Vector{Int32}
 @test get_colors(ColPackPartialColoring(J, "COLUMN_PARTIAL_DISTANCE_TWO", "NATURAL")) isa
     Vector{Int32}
-@test_broken get_colors(
+@test get_colors(
     ColPackBiColoring(J, "EXPLICIT_COVERING__STAR_BICOLORING", "NATURAL")
-) isa NTuple{Vector{Int32},2}
+) isa Tuple{Vector{Int32}, Vector{Int32}}
 
 ## Error on dense matrix
 

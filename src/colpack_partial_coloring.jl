@@ -122,7 +122,12 @@ Retrieve the ordering from a [`ColPackPartialColoring`](@ref) as a vector of int
 """
 function get_ordering(coloring::ColPackPartialColoring)
     order_partial_coloring(coloring.refColPack[], coloring.ordering)
-    coloring.ordering .+= Cint(1)
+    if coloring.method == "COLUMN_PARTIAL_DISTANCE_TWO"
+        offset = minimum(coloring.ordering) - 1
+        coloring.ordering .-= Cint(offset)
+    else
+        coloring.ordering .+= Cint(1)
+    end
     return coloring.ordering
 end
 
