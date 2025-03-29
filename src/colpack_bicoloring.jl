@@ -83,15 +83,15 @@ function ColPackBiColoring(
     nrows, ncols = size(M)
 
     # Version adolc
-    # Mᵀ = sparse(M')
-    # adolc, adolc_mem = csr_to_adolc(Mᵀ)
-    # ret = build_bicoloring_from_adolc(refColPack, reflen1, reflen2, adolc, nrows, ncols, method, order, verbose)
+    Mᵀ = sparse(M')
+    adolc, adolc_mem = csr_to_adolc(Mᵀ)
+    ret = build_bicoloring_from_adolc(refColPack, reflen1, reflen2, adolc, nrows, ncols, method, order, verbose)
 
     # Version csc
     # ColPack expects sparse CSC / CSR matrices with 0-based indexing.
-    rowval = Cint.(M.rowval) .- Cint(1)
-    colptr = Cint.(M.colptr) .- Cint(1)
-    ret = build_bicoloring_from_csc(refColPack, reflen1, reflen2, rowval, colptr, nrows, ncols, method, order, verbose)
+    # rowval = Cint.(M.rowval) .- Cint(1)
+    # colptr = Cint.(M.colptr) .- Cint(1)
+    # ret = build_bicoloring_from_csc(refColPack, reflen1, reflen2, rowval, colptr, nrows, ncols, method, order, verbose)
     (ret == 0) && error("ColPack partial coloring failed.")
     ordering = zeros(Cint, reflen1[] + reflen2[])
     coloring1 = zeros(Cint, reflen1[])
