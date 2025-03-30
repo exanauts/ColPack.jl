@@ -9,8 +9,11 @@ A Julia interface to the C++ library [ColPack](https://github.com/CSCsw/ColPack)
 - [`ColPackPartialColoring`](@ref)
 - [`ColPackBiColoring`](@ref)
 - [`colpack`](@ref)
+- [`get_ordering`](@ref)
 - [`get_colors`](@ref)
 - [`ncolors`](@ref)
+- [`timer_ordering`](@ref)
+- [`timer_coloring`](@ref)
 """
 module ColPack
 
@@ -32,6 +35,6 @@ include("colpack_bicoloring.jl")
 
 # Exports
 
-export ColPackColoring, ColPackPartialColoring, ColPackBiColoring, colpack, get_colors, ncolors
+export ColPackColoring, ColPackPartialColoring, ColPackBiColoring, colpack, get_ordering, get_colors, ncolors, timer_ordering, timer_coloring
 
 end #module

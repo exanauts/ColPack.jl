@@ -35,6 +35,7 @@ The fields of this struct are not part of the public API, they are only useful t
 """
 mutable struct ColPackBiColoring
     refColPack::Base.RefValue{Ptr{Cvoid}}
+    ordering::Vector{Cint}
     coloring1::Vector{Cint}
     coloring2::Vector{Cint}
     method::String
@@ -59,9 +60,10 @@ function ColPackBiColoring(
         refColPack, reflen1, reflen2, filename, method, order, verbose
     )
     (ret == 0) && error("ColPack bicoloring failed.")
+    ordering = zeros(Cint, reflen1[] + reflen2[])
     coloring1 = zeros(Cint, reflen1[])
     coloring2 = zeros(Cint, reflen2[])
-    g = ColPackBiColoring(refColPack, coloring1, coloring2, method, order)
+    g = ColPackBiColoring(refColPack, ordering, coloring1, coloring2, method, order)
     finalizer(free_bicoloring, g)
     return g
 end
@@ -81,22 +83,33 @@ function ColPackBiColoring(
     nrows, ncols = size(M)
 
     # Version adolc
-    # Mᵀ = sparse(M')
-    # adolc, adolc_mem = csr_to_adolc(Mᵀ)
-    # ret = build_bicoloring_from_adolc(refColPack, reflen1, reflen2, adolc, nrows, ncols, method, order, verbose)
+    Mᵀ = sparse(M')
+    adolc, adolc_mem = csr_to_adolc(Mᵀ)
+    ret = build_bicoloring_from_adolc(refColPack, reflen1, reflen2, adolc, nrows, ncols, method, order, verbose)
 
     # Version csc
     # ColPack expects sparse CSC / CSR matrices with 0-based indexing.
-    rowval = Cint.(M.rowval) .- Cint(1)
-    colptr = Cint.(M.colptr) .- Cint(1)
-    ret = build_bicoloring_from_csc(refColPack, reflen1, reflen2, rowval, colptr, nrows, ncols, method, order, verbose)
-
+    # rowval = Cint.(M.rowval) .- Cint(1)
+    # colptr = Cint.(M.colptr) .- Cint(1)
+    # ret = build_bicoloring_from_csc(refColPack, reflen1, reflen2, rowval, colptr, nrows, ncols, method, order, verbose)
     (ret == 0) && error("ColPack partial coloring failed.")
+    ordering = zeros(Cint, reflen1[] + reflen2[])
     coloring1 = zeros(Cint, reflen1[])
     coloring2 = zeros(Cint, reflen2[])
-    g = ColPackBiColoring(refColPack, coloring1, coloring2, method, order)
+    g = ColPackBiColoring(refColPack, ordering, coloring1, coloring2, method, order)
     finalizer(free_partial_coloring, g)
     return g
+end
+
+"""
+    get_ordering(coloring::ColPackBiColoring)
+
+Retrieve the ordering from a [`ColPackBiColoring`](@ref) as a vector of integers.
+"""
+function get_ordering(coloring::ColPackBiColoring)
+    order_bicoloring(coloring.refColPack[], coloring.ordering)
+    coloring.ordering .+= Cint(1)
+    return coloring.ordering
 end
 
 """
@@ -105,7 +118,7 @@ end
 Retrieve the colors from a [`ColPackBiColoring`](@ref) as two vectors of integers, one for the rows and one for the columns respectively.
 """
 function get_colors(coloring::ColPackBiColoring)
-    get_bicoloring(coloring.refColPack[], coloring.coloring1, coloring.coloring2)
+    colors_bicoloring(coloring.refColPack[], coloring.coloring1, coloring.coloring2)
     #=
     Zero is a neutral color in bicoloring, it may make sense to keep it.
     I am not yet sure how the coloring vectors are defined.
@@ -122,4 +135,22 @@ Retrieve the number of colors from a [`ColPackBiColoring`](@ref).
 """
 function ncolors(coloring::ColPackBiColoring)
     return ncolors_bicoloring(coloring.refColPack[])
+end
+
+"""
+    timer_ordering(coloring::ColPackBiColoring)
+
+Retrieve the timer for ordering from a [`ColPackBiColoring`](@ref).
+"""
+function timer_ordering(coloring::ColPackBiColoring)
+    return timer_order_bicoloring(coloring.refColPack[])
+end
+
+"""
+    timer_coloring(coloring::ColPackBiColoring)
+
+Retrieve the timer for coloring from a [`ColPackBiColoring`](@ref).
+"""
+function timer_coloring(coloring::ColPackBiColoring)
+    return timer_colors_bicoloring(coloring.refColPack[])
 end

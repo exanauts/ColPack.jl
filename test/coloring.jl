@@ -12,14 +12,14 @@ using Test
 rng = StableRNG(63)
 
 asymmetric_params = vcat(
-    [(10, 20, p) for p in (0.0:0.1:1.0)],  #
+    [(10, 20, p) for p in (0.0:0.1:1.0)],
     [(20, 10, p) for p in (0.0:0.1:1.0)],
-    [(100, 200, p) for p in (0.01:0.01:0.05)],  #
+    [(100, 200, p) for p in (0.01:0.01:0.05)],
     [(200, 100, p) for p in (0.01:0.01:0.05)],
 )
 
 symmetric_params = vcat(
-    [(10, p) for p in (0.0:0.1:1.0)], #
+    [(10, p) for p in (0.0:0.1:1.0)],
     [(100, p) for p in (0.01:0.01:0.05)],
 )
 
@@ -65,10 +65,17 @@ end
                 @test ncolors(coloring_mat) == ncolors(coloring_file)
                 colors = get_colors(coloring_file)
                 test_colors(H, method, colors)
+                @test get_ordering(coloring_mat) == get_ordering(coloring_file)
+                ordering = get_ordering(coloring_file)
+                @test isperm(ordering)
+                @test timer_ordering(coloring_mat) > 0
+                @test timer_ordering(coloring_file) > 0
+                @test timer_coloring(coloring_mat) > 0
+                @test timer_coloring(coloring_file) > 0
             end
         end
     end
-end;
+end
 
 @testset verbose = true "Bipartite graph partial coloring" begin
     @testset "$method" for method in PARTIAL_COLORING_METHODS
@@ -81,17 +88,29 @@ end;
                 coloring_file = ColPackPartialColoring(
                     filename, method, order; verbose=false
                 )
-                @test length(get_colors(coloring_mat)) == length(get_colors(coloring_file))
-                @test ncolors(coloring_mat) ≥ 1
-                @test ncolors(coloring_file) ≥ 1
-                # this is not always true since we use different algorithms
-                # @test get_colors(coloring_mat) == get_colors(coloring_file)
-                test_colors(J, method, get_colors(coloring_mat))
-                test_colors(J, method, get_colors(coloring_file))
+                @test get_ordering(coloring_mat) == get_ordering(coloring_file)
+                ordering = get_ordering(coloring_file)
+                valid_ordering = isperm(ordering)
+                if order != "LARGEST_FIRST"
+                    @test valid_ordering
+                end
+                if valid_ordering
+                    @test length(get_colors(coloring_mat)) == length(get_colors(coloring_file))
+                    @test ncolors(coloring_mat) ≥ 1
+                    @test ncolors(coloring_file) ≥ 1
+                    # this is not always true since we use different algorithms
+                    # @test get_colors(coloring_mat) == get_colors(coloring_file)
+                    test_colors(J, method, get_colors(coloring_mat))
+                    test_colors(J, method, get_colors(coloring_file))
+                    @test timer_ordering(coloring_mat) > 0
+                    @test timer_ordering(coloring_file) > 0
+                    @test timer_coloring(coloring_mat) > 0
+                    @test timer_coloring(coloring_file) > 0
+                end
             end
         end
     end
-end;
+end
 
 @testset verbose = true "Bipartite graph bicoloring" begin
     @testset "$method" for method in BICOLORING_METHODS
@@ -104,7 +123,11 @@ end;
                 @test ncolors(coloring_file) ≥ 1
                 colors1, colors2 = get_colors(coloring_file)
                 test_colors(J, method, colors1, colors2)
+                ordering = get_ordering(coloring_file)
+                @test isperm(ordering)
+                @test timer_ordering(coloring_file) > 0
+                @test timer_coloring(coloring_file) > 0
             end
         end
     end
-end;
+end

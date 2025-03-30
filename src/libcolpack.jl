@@ -141,18 +141,54 @@ function build_bicoloring_from_csc(
     )::Cint
 end
 
-function get_coloring(ref, coloring)
-    @ccall libcolpack.get_coloring(ref::Ptr{Cvoid}, coloring::Ptr{Cint})::Cvoid
+function order_coloring(ref, ordering)
+    @ccall libcolpack.order_coloring(ref::Ptr{Cvoid}, ordering::Ptr{Cint})::Cvoid
 end
 
-function get_partial_coloring(ref, coloring)
-    @ccall libcolpack.get_partial_coloring(ref::Ptr{Cvoid}, coloring::Ptr{Cint})::Cvoid
+function order_partial_coloring(ref, ordering)
+    @ccall libcolpack.order_partial_coloring(ref::Ptr{Cvoid}, ordering::Ptr{Cint})::Cvoid
 end
 
-function get_bicoloring(ref, left_coloring, right_coloring)
-    @ccall libcolpack.get_bicoloring(
+function order_bicoloring(ref, ordering)
+    @ccall libcolpack.order_bicoloring(ref::Ptr{Cvoid}, ordering::Ptr{Cint})::Cvoid
+end
+
+function timer_order_coloring(ref)
+    @ccall libcolpack.timer_order_coloring(ref::Ptr{Cvoid})::Cdouble
+end
+
+function timer_order_partial_coloring(ref)
+    @ccall libcolpack.timer_order_partial_coloring(ref::Ptr{Cvoid})::Cdouble
+end
+
+function timer_order_bicoloring(ref)
+    @ccall libcolpack.timer_order_bicoloring(ref::Ptr{Cvoid})::Cdouble
+end
+
+function colors_coloring(ref, coloring)
+    @ccall libcolpack.colors_coloring(ref::Ptr{Cvoid}, coloring::Ptr{Cint})::Cvoid
+end
+
+function colors_partial_coloring(ref, coloring)
+    @ccall libcolpack.colors_partial_coloring(ref::Ptr{Cvoid}, coloring::Ptr{Cint})::Cvoid
+end
+
+function colors_bicoloring(ref, left_coloring, right_coloring)
+    @ccall libcolpack.colors_bicoloring(
         ref::Ptr{Cvoid}, left_coloring::Ptr{Cint}, right_coloring::Ptr{Cint}
     )::Cvoid
+end
+
+function timer_colors_coloring(ref)
+    @ccall libcolpack.timer_colors_coloring(ref::Ptr{Cvoid})::Cdouble
+end
+
+function timer_colors_partial_coloring(ref)
+    @ccall libcolpack.timer_colors_partial_coloring(ref::Ptr{Cvoid})::Cdouble
+end
+
+function timer_colors_bicoloring(ref)
+    @ccall libcolpack.timer_colors_bicoloring(ref::Ptr{Cvoid})::Cdouble
 end
 
 function ncolors_coloring(ref)
